@@ -4,15 +4,18 @@
   --primary-color: #FF3737;
   --primary-hover: #e62e2e;
   --success-color: #28a745;
+  --accent-color: #FF6B6B;
   --bg-light: #FCF5F5;
   --bg-lighter: #FFE2E2;
-  --text-dark: #333;
-  --text-light: #666;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
-  --transition: all 0.3s ease;
-  --border-radius: 12px;
+  --bg-white: #FFFFFF;
+  --text-dark: #2C3E50;
+  --text-light: #6C757D;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.15);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --border-radius: 16px;
+  --border-radius-sm: 12px;
 }
 
 /* Reset y estilos base */
@@ -27,10 +30,11 @@ html {
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-dark);
-  line-height: 1.6;
+  line-height: 1.7;
   background-color: var(--bg-light);
+  overflow-x: hidden;
 }
 
 /* Navegación */
@@ -692,5 +696,237 @@ body {
   .about-badge {
     position: static;
     margin-top: 1rem;
+  }
+}
+
+/* Sección de Operativos Veterinarios */
+.operativos-section {
+  background: linear-gradient(135deg, #fff 0%, var(--bg-light) 100%);
+  padding: 80px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.operativos-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 107, 107, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.operativos-intro {
+  background: white;
+  padding: 2.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 3rem;
+  border-left: 5px solid var(--primary-color);
+}
+
+.operativos-intro h3 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.operativos-intro h3 i {
+  font-size: 2rem;
+}
+
+.operativos-intro p {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.operativos-intro p:last-child {
+  margin-bottom: 0;
+}
+
+.operativo-card {
+  background: white;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid transparent;
+}
+
+.operativo-card:hover {
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--accent-color);
+}
+
+.operativo-image-container {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+  background: var(--bg-light);
+}
+
+.operativo-image-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.operativo-card:hover .operativo-image-container img {
+  transform: scale(1.15);
+}
+
+.operativo-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: var(--primary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  box-shadow: var(--shadow-md);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.operativo-content {
+  padding: 2rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.operativo-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.operativo-title i {
+  font-size: 1.4rem;
+}
+
+.operativo-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-light);
+  font-size: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 0.75rem;
+  background: var(--bg-light);
+  border-radius: var(--border-radius-sm);
+}
+
+.operativo-location i {
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.operativo-description {
+  color: var(--text-dark);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+}
+
+.operativo-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.operativo-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+}
+
+.operativo-feature i {
+  color: var(--success-color);
+  font-size: 1.1rem;
+  min-width: 20px;
+}
+
+.operativo-cta {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--accent-color) 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 50px;
+  transition: var(--transition);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+
+.operativo-cta:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  color: white;
+  background: linear-gradient(135deg, var(--primary-hover) 0%, var(--primary-color) 100%);
+}
+
+.operativo-cta i {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .operativos-section {
+    padding: 40px 0;
+  }
+
+  .operativos-intro {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .operativos-intro h3 {
+    font-size: 1.5rem;
+  }
+
+  .operativos-intro p {
+    font-size: 1rem;
+  }
+
+  .operativo-image-container {
+    height: 220px;
+  }
+
+  .operativo-content {
+    padding: 1.5rem;
+  }
+
+  .operativo-title {
+    font-size: 1.4rem;
   }
 }
