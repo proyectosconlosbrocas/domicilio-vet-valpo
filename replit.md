@@ -14,6 +14,11 @@ This is a static website for "Domicilio Vet Valpo," a mobile veterinary service 
 - Created dedicated cards for sterilization and deworming operative services
 - Updated navigation menu to include "Operativos" link
 - Improved overall typography and spacing throughout the site
+- Generated and integrated 6 custom veterinary icons in brand colors (#FF3737)
+- Added personalized icons to service cards (stethoscope, medical cross, paw-heart)
+- Incorporated custom icons in expertise section (4 different veterinary symbols)
+- Enhanced operativos section with themed icons (medical cross, syringe)
+- Implemented hover animations and effects for all custom icons
 
 ## User Preferences
 
@@ -122,6 +127,13 @@ Could have used React or Vue for component architecture, but rejected due to:
 - Custom logo/icon: `assets/icono.png`
 - Service images: `assets/foto1.png`, `assets/foto2.png`, `assets/foto3.png`
 - Specialized service images: `assets/homeopatia.png`, `assets/quirurjico.png`
+- Custom veterinary icons (AI-generated, brand color #FF3737):
+  - `assets/icon-estetoscopio.png` - Stethoscope (used in consultation service)
+  - `assets/icon-jeringa.png` - Syringe/vaccine (used in deworming operative & vaccination)
+  - `assets/icon-pata-corazon.png` - Paw with heart (used in homeopathy & expertise)
+  - `assets/icon-mascotas.png` - Dog & cat (used in home care expertise)
+  - `assets/icon-cruz-veterinaria.png` - Veterinary cross (used in surgery & sterilization)
+  - `assets/icon-plato.png` - Pet bowl (available for future use)
 - Custom stylesheet: `style.css`
 - Custom JavaScript: `script.js`
 
