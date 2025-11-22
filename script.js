@@ -1,5 +1,11 @@
 
-// Smooth scroll para los enlaces de navegación
+// Inicializar AOS (Animate On Scroll)
+AOS.init({
+  duration: 1000,
+  once: true,
+  offset: 100
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   // Cerrar menú móvil al hacer clic en un enlace
   const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
@@ -14,28 +20,35 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Animación de entrada para las cards
-  const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+  // Contador animado para estadísticas
+  const animateCounter = (element, target) => {
+    let current = 0;
+    const increment = target / 100;
+    const timer = setInterval(() => {
+      current += increment;
+      if (current >= target) {
+        element.textContent = target;
+        clearInterval(timer);
+      } else {
+        element.textContent = Math.floor(current);
+      }
+    }, 20);
   };
 
-  const observer = new IntersectionObserver(function(entries) {
+  // Observador para activar contador cuando sea visible
+  const counterObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
+      if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
+        const target = parseInt(entry.target.getAttribute('data-target'));
+        animateCounter(entry.target, target);
+        entry.target.classList.add('counted');
       }
     });
-  }, observerOptions);
+  }, { threshold: 0.5 });
 
-  // Aplicar animación a las cards
-  const cards = document.querySelectorAll('.service-card');
-  cards.forEach((card, index) => {
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px)';
-    card.style.transition = `all 0.6s ease ${index * 0.1}s`;
-    observer.observe(card);
+  // Observar todos los contadores
+  document.querySelectorAll('.stat-number').forEach(counter => {
+    counterObserver.observe(counter);
   });
 
   // Cambiar estilo de navbar al hacer scroll
@@ -52,5 +65,33 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     lastScroll = currentScroll;
+  });
+
+  // Manejar envío del formulario de contacto
+  const contactForm = document.getElementById('contactForm');
+  if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const pet = document.getElementById('pet').value;
+      const message = document.getElementById('message').value;
+      
+      const whatsappMessage = `Hola, mi nombre es ${name}. Mi mascota se llama ${pet}. ${message}. Mi teléfono es ${phone}.`;
+      const whatsappURL = `https://wa.me/56965222368?text=${encodeURIComponent(whatsappMessage)}`;
+      
+      window.open(whatsappURL, '_blank');
+      contactForm.reset();
+    });
+  }
+
+  // Efecto parallax suave en el hero
+  window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const heroImage = document.querySelector('.hero-image img');
+    if (heroImage && scrolled < 800) {
+      heroImage.style.transform = `translateY(${scrolled * 0.3}px)`;
+    }
   });
 });
