@@ -86,12 +86,4 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Efecto parallax suave en el hero
-  window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const heroImage = document.querySelector('.hero-image img');
-    if (heroImage && scrolled < 800) {
-      heroImage.style.transform = `translateY(${scrolled * 0.3}px)`;
-    }
-  });
 });
