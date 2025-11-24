@@ -1,4 +1,3 @@
-
 /* Variables CSS para consistencia */
 :root {
   --primary-color: #FF3737;
@@ -1034,4 +1033,35 @@ body {
   .operativo-title {
     font-size: 1.4rem;
   }
+}
+
+/* Styles for the new 'More Services' card */
+.service-category-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--bg-lighter);
+}
+
+.service-list {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 1.5rem;
+}
+
+.service-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: var(--text-light);
+  margin-bottom: 0.5rem;
+}
+
+.service-list li i {
+  color: var(--primary-color);
+  margin-top: 5px; /* Align icon with text */
+  font-size: 0.9rem;
 }
