@@ -51,9 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
     counterObserver.observe(counter);
   });
 
-  // Cambiar estilo de navbar al hacer scroll
+  // Cambiar estilo de navbar al hacer scroll y mostrar botón volver arriba
   let lastScroll = 0;
   const navbar = document.querySelector('.navbar');
+  const backToTopBtn = document.getElementById('backToTop');
   
   window.addEventListener('scroll', () => {
     const currentScroll = window.pageYOffset;
@@ -63,15 +64,40 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       navbar.classList.remove('scrolled');
     }
+
+    // Mostrar/ocultar botón volver arriba
+    if (currentScroll > 300) {
+      backToTopBtn.classList.add('show');
+    } else {
+      backToTopBtn.classList.remove('show');
+    }
     
     lastScroll = currentScroll;
   });
+
+  // Funcionalidad del botón volver arriba
+  if (backToTopBtn) {
+    backToTopBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
 
   // Manejar envío del formulario de contacto
   const contactForm = document.getElementById('contactForm');
   if (contactForm) {
     contactForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      
+      const submitBtn = contactForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      
+      // Mostrar estado de envío
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Enviando...';
+      submitBtn.style.opacity = '0.7';
       
       const name = document.getElementById('name').value;
       const phone = document.getElementById('phone').value;
@@ -81,8 +107,22 @@ document.addEventListener('DOMContentLoaded', function() {
       const whatsappMessage = `Hola, mi nombre es ${name}. Mi mascota se llama ${pet}. ${message}. Mi teléfono es ${phone}.`;
       const whatsappURL = `https://wa.me/56965222368?text=${encodeURIComponent(whatsappMessage)}`;
       
-      window.open(whatsappURL, '_blank');
-      contactForm.reset();
+      // Simular un pequeño delay para mejor UX
+      setTimeout(() => {
+        window.open(whatsappURL, '_blank');
+        
+        // Mostrar éxito
+        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>¡Enviado!';
+        submitBtn.style.background = 'var(--success-color)';
+        
+        setTimeout(() => {
+          contactForm.reset();
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalText;
+          submitBtn.style.opacity = '1';
+          submitBtn.style.background = '';
+        }, 2000);
+      }, 500);
     });
   }
 

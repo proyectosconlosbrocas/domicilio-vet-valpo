@@ -753,7 +753,7 @@ body {
 }
 
 /* Botones flotantes */
-.whatsapp, .instagram-btn {
+.whatsapp, .instagram-btn, .back-to-top {
   position: fixed;
   width: 60px;
   height: 60px;
@@ -767,6 +767,8 @@ body {
   box-shadow: var(--shadow-md);
   transition: var(--transition);
   text-decoration: none;
+  border: none;
+  cursor: pointer;
 }
 
 .whatsapp {
@@ -781,19 +783,34 @@ body {
   color: white;
 }
 
-.whatsapp:hover, .instagram-btn:hover {
+.back-to-top {
+  bottom: 190px;
+  background: var(--text-dark);
+  color: white;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(0);
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.whatsapp:hover, .instagram-btn:hover, .back-to-top:hover {
   transform: scale(1.1);
   box-shadow: var(--shadow-lg);
   color: white;
 }
 
-.whatsapp:focus, .instagram-btn:focus {
+.whatsapp:focus, .instagram-btn:focus, .back-to-top:focus {
   outline: 4px solid rgba(255, 255, 255, 0.8);
   outline-offset: 3px;
   transform: scale(1.15);
 }
 
-.whatsapp::before, .instagram-btn::before {
+.whatsapp::before, .instagram-btn::before, .back-to-top::before {
   content: attr(aria-label);
   position: absolute;
   right: 70px;
@@ -808,8 +825,8 @@ body {
   transition: opacity 0.3s ease;
 }
 
-.whatsapp:hover::before, .instagram-btn:hover::before,
-.whatsapp:focus::before, .instagram-btn:focus::before {
+.whatsapp:hover::before, .instagram-btn:hover::before, .back-to-top:hover::before,
+.whatsapp:focus::before, .instagram-btn:focus::before, .back-to-top:focus::before {
   opacity: 1;
 }
 
@@ -911,7 +928,7 @@ body {
     height: 200px;
   }
   
-  .whatsapp, .instagram-btn {
+  .whatsapp, .instagram-btn, .back-to-top {
     width: 50px;
     height: 50px;
     font-size: 24px;
@@ -924,6 +941,10 @@ body {
   
   .instagram-btn {
     bottom: 85px;
+  }
+
+  .back-to-top {
+    bottom: 150px;
   }
 
   .stat-number {
