@@ -6,6 +6,15 @@ This is a static website for "Domicilio Vet Valpo," a mobile veterinary service 
 
 ## Recent Changes
 
+**December 5, 2025:**
+- Fixed HTML structure issues (footer tag closure)
+- Improved mobile responsiveness for hero carousel using viewport-relative max-heights (70vh, 50vh, 45vh, 40vh)
+- Changed carousel images to use object-fit: cover instead of contain for better visual presentation
+- Fixed navbar brand text - using responsive font sizes instead of truncation
+- Removed duplicate carousel slides and restored unique image set (8 distinct images)
+- Enhanced Instagram feed error handling with fallback placeholder when images fail to load
+- Added checkAllFailed() function to show placeholder when all Instagram CDN images are blocked by CORS
+
 **November 22, 2025:**
 - Enhanced visual aesthetics with improved color palette, shadows, and gradients
 - Added new CSS variables for accent colors and improved border radius system
