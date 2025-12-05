@@ -88,6 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Función para cargar el feed de Instagram
   function loadInstagramFeed() {
+    const instagramPostsContainer = document.getElementById('instagram-posts');
+    if (!instagramPostsContainer) return;
+
     fetch('instagram_posts.json')
       .then(response => {
         if (!response.ok) {
@@ -96,30 +99,71 @@ document.addEventListener('DOMContentLoaded', function() {
         return response.json();
       })
       .then(data => {
-        const instagramPostsContainer = document.getElementById('instagram-posts');
-        if (instagramPostsContainer) {
-          data.forEach(post => {
-            const colDiv = document.createElement('div');
-            colDiv.className = 'col-6 col-md-4 col-lg-4'; // Bootstrap grid for responsive layout
+        if (!Array.isArray(data) || data.length === 0) {
+          showInstagramPlaceholder(instagramPostsContainer);
+          return;
+        }
 
-            const imgLink = document.createElement('a');
-            imgLink.href = post.url; // Assuming post.url is the direct link to the Instagram post
-            imgLink.target = "_blank";
-            imgLink.rel = "noopener noreferrer";
-            imgLink.className = "instagram-post-link";
+        let totalPosts = data.length;
+        let failedCount = 0;
 
-            const img = document.createElement('img');
-            img.src = post.url; // The image URL from our JSON
-            img.alt = "Publicación de Instagram";
-            img.className = 'img-fluid rounded shadow-sm instagram-post-img';
+        data.forEach(post => {
+          const imageUrl = post.image_local_url || post.url;
+          const postUrl = post.post_page_url || 'https://www.instagram.com/domicilio.vet.valpo/';
+          
+          if (!imageUrl) {
+            console.warn('Instagram post skipped: no image URL', post);
+            failedCount++;
+            checkAllFailed();
+            return;
+          }
 
-            imgLink.appendChild(img);
-            colDiv.appendChild(imgLink);
-            instagramPostsContainer.appendChild(colDiv);
-          });
+          const colDiv = document.createElement('div');
+          colDiv.className = 'col-6 col-md-4 col-lg-4';
+
+          const imgLink = document.createElement('a');
+          imgLink.href = postUrl;
+          imgLink.target = "_blank";
+          imgLink.rel = "noopener noreferrer";
+          imgLink.className = "instagram-post-link";
+
+          const img = document.createElement('img');
+          img.src = imageUrl;
+          img.alt = "Publicación de Instagram";
+          img.className = 'img-fluid rounded shadow-sm instagram-post-img';
+          img.onerror = function() {
+            console.warn('Instagram image failed to load:', imageUrl);
+            colDiv.style.display = 'none';
+            failedCount++;
+            checkAllFailed();
+          };
+
+          imgLink.appendChild(img);
+          colDiv.appendChild(imgLink);
+          instagramPostsContainer.appendChild(colDiv);
+        });
+
+        function checkAllFailed() {
+          if (failedCount >= totalPosts) {
+            showInstagramPlaceholder(instagramPostsContainer);
+          }
         }
       })
-      .catch(error => console.error('Error al cargar el feed de Instagram:', error));
+      .catch(error => {
+        console.error('Error al cargar el feed de Instagram:', error);
+        showInstagramPlaceholder(instagramPostsContainer);
+      });
+  }
+
+  function showInstagramPlaceholder(container) {
+    container.innerHTML = `
+      <div class="col-12 text-center py-4">
+        <p class="text-muted">Visita nuestro Instagram para ver las últimas publicaciones</p>
+        <a href="https://www.instagram.com/domicilio.vet.valpo/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary">
+          <i class="bi bi-instagram me-2"></i>Ver en Instagram
+        </a>
+      </div>
+    `;
   }
 
   // Llamar a la función para cargar el feed de Instagram

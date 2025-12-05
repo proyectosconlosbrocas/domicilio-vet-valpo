@@ -205,19 +205,19 @@ body {
 
 /* Carousel specific styles */
 #heroCarousel {
-  margin-top: -120px; /* Adjust this value to move it up */
+  margin-top: -120px;
 }
 
 #heroCarousel .carousel-item {
-  height: 400px; /* Or a height that fits the design */
-  background-color: transparent; /* Make item background transparent */
+  background-color: transparent;
 }
 
 #heroCarousel .carousel-item img {
-  height: 100%;
   width: 100%;
-  object-fit: contain;
-  border-radius: var(--border-radius) !important; /* Add this line */
+  max-height: 70vh;
+  object-fit: cover;
+  object-position: center;
+  border-radius: var(--border-radius) !important;
 }
 
 /* Sección de Estadísticas */
@@ -721,11 +721,19 @@ body {
   .stat-number {
     font-size: 2.5rem;
   }
+
+  #heroCarousel {
+    margin-top: 0;
+  }
+
+  #heroCarousel .carousel-item img {
+    max-height: 50vh;
+  }
 }
 
 @media (max-width: 768px) {
   .hero-section {
-    padding: 40px 0;
+    padding: 30px 0;
   }
   
   .services-section {
@@ -734,6 +742,30 @@ body {
   
   .hero-title {
     font-size: 1.75rem;
+  }
+
+  .hero-logo {
+    width: 120px;
+    height: 120px;
+    margin-top: 10px;
+  }
+
+  #heroCarousel {
+    margin-top: 20px;
+  }
+
+  #heroCarousel .carousel-item img {
+    max-height: 45vh;
+  }
+
+  .hero-icons-container {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .hero-icon {
+    width: 32px;
+    height: 32px;
   }
   
   .service-card-image {
@@ -744,7 +776,7 @@ body {
     width: 50px;
     height: 50px;
     font-size: 24px;
-    right: 20px;
+    right: 15px;
   }
   
   .whatsapp {
@@ -762,28 +794,192 @@ body {
   .contact-form-wrapper {
     padding: 1.5rem;
   }
+
+  .navbar-brand {
+    font-size: 0.9rem;
+  }
+
+  .logonav {
+    width: 50px;
+    height: 50px;
+  }
+
+  .navbar-brand-logo {
+    margin-right: 0.5rem;
+  }
+
+  .service-card-title {
+    font-size: 1.25rem;
+  }
+
+  .price-amount {
+    font-size: 1.5rem;
+  }
+
+  .testimonial-card {
+    padding: 1.5rem;
+  }
+
+  .about-image-wrapper img {
+    max-height: 350px;
+    object-fit: cover;
+  }
 }
 
 @media (max-width: 576px) {
+  .hero-section {
+    padding: 20px 0;
+  }
+
   .hero-title {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
   }
   
   .hero-subtitle {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
   
   .section-title {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
   }
   
   .hero-description {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .hero-description p {
+    margin-bottom: 0.75rem;
+  }
+
+  .hero-logo {
+    width: 100px;
+    height: 100px;
+  }
+
+  #heroCarousel .carousel-item img {
+    max-height: 40vh;
+  }
+
+  .hero-icons-container {
+    gap: 0.5rem;
+  }
+
+  .hero-icon {
+    width: 28px;
+    height: 28px;
   }
 
   .about-badge {
     position: static;
     margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .about-badge i {
+    font-size: 1.2rem;
+  }
+
+  .navbar-brand {
+    font-size: 0.75rem;
+  }
+
+  .logonav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stat-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .stat-number {
+    font-size: 1.75rem;
+  }
+
+  .stat-label {
+    font-size: 0.95rem;
+  }
+
+  .service-card-body {
+    padding: 1rem;
+  }
+
+  .service-icon-header {
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .service-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .service-card-title {
+    font-size: 1.1rem;
+  }
+
+  .service-card-text {
+    font-size: 0.9rem;
+  }
+
+  .service-price {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .price-amount {
+    font-size: 1.4rem;
+  }
+
+  .btn-service {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+
+  .contact-info-item {
+    padding: 0.75rem;
+  }
+
+  .contact-info-item i {
+    font-size: 1.5rem;
+  }
+
+  .contact-info-item h4 {
+    font-size: 1rem;
+  }
+
+  .whatsapp, .instagram-btn {
+    width: 45px;
+    height: 45px;
+    font-size: 22px;
+    right: 10px;
+  }
+
+  .whatsapp {
+    bottom: 15px;
+  }
+
+  .instagram-btn {
+    bottom: 75px;
+  }
+
+  .expertise-item {
+    font-size: 0.95rem;
+    padding: 0.4rem;
+  }
+
+  .expertise-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .instagram-section {
+    padding: 40px 0;
   }
 }
 
