@@ -94,36 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // Contador animado para estadísticas
-  const animateCounter = (element, target) => {
-    let current = 0;
-    const increment = target / 100;
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= target) {
-        element.textContent = target;
-        clearInterval(timer);
-      } else {
-        element.textContent = Math.floor(current);
-      }
-    }, 20);
-  };
 
-  // Observador para activar contador cuando sea visible
-  const counterObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !entry.target.classList.contains('counted')) {
-        const target = parseInt(entry.target.getAttribute('data-target'));
-        animateCounter(entry.target, target);
-        entry.target.classList.add('counted');
-      }
-    });
-  }, { threshold: 0.5 });
-
-  // Observar todos los contadores
-  document.querySelectorAll('.stat-number').forEach(counter => {
-    counterObserver.observe(counter);
-  });
 
   // Cambiar estilo de navbar al hacer scroll y mostrar botón volver arriba
   let lastScroll = 0;
