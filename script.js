@@ -86,4 +86,43 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+  // Función para cargar el feed de Instagram
+  function loadInstagramFeed() {
+    fetch('instagram_posts.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const instagramPostsContainer = document.getElementById('instagram-posts');
+        if (instagramPostsContainer) {
+          data.forEach(post => {
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-6 col-md-4 col-lg-4'; // Bootstrap grid for responsive layout
+
+            const imgLink = document.createElement('a');
+            imgLink.href = post.url; // Assuming post.url is the direct link to the Instagram post
+            imgLink.target = "_blank";
+            imgLink.rel = "noopener noreferrer";
+            imgLink.className = "instagram-post-link";
+
+            const img = document.createElement('img');
+            img.src = post.url; // The image URL from our JSON
+            img.alt = "Publicación de Instagram";
+            img.className = 'img-fluid rounded shadow-sm instagram-post-img';
+
+            imgLink.appendChild(img);
+            colDiv.appendChild(imgLink);
+            instagramPostsContainer.appendChild(colDiv);
+          });
+        }
+      })
+      .catch(error => console.error('Error al cargar el feed de Instagram:', error));
+  }
+
+  // Llamar a la función para cargar el feed de Instagram
+  loadInstagramFeed();
+
 });
