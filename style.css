@@ -586,51 +586,6 @@ body {
   font-weight: 700;
 }
 
-/* Sección de Testimonios */
-.testimonials-section {
-  background-color: white;
-}
-
-.testimonial-card {
-  background: var(--bg-light);
-  padding: 2rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition);
-  height: 100%;
-}
-
-.testimonial-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-md);
-}
-
-.testimonial-stars {
-  color: #FFD700;
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-}
-
-.testimonial-text {
-  font-size: 1rem;
-  color: var(--text-dark);
-  margin-bottom: 1.5rem;
-  font-style: italic;
-  line-height: 1.6;
-}
-
-.testimonial-author {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-weight: 600;
-  color: var(--primary-color);
-}
-
-.testimonial-author i {
-  font-size: 2rem;
-}
-
 /* Sección de Contacto */
 .contact-section {
   background: linear-gradient(135deg, var(--bg-lighter) 0%, var(--bg-light) 100%);
@@ -1466,54 +1421,14 @@ body {
   }
 }
 
-/* Sección de Instagram Feed */
+/* Sección de Instagram */
 .instagram-section {
-  background-color: var(--bg-white); /* Fondo claro para contrastar */
-  padding: 80px 0;
+  background-color: var(--bg-light);
+  padding: 60px 0;
 }
 
 .instagram-section .section-title {
   color: var(--primary-color);
-  margin-bottom: 0.5rem;
-}
-
-.instagram-section .section-subtitle {
-  color: var(--text-light);
-  margin-bottom: 2rem;
-}
-
-.instagram-post-link {
-  display: block;
-  border-radius: var(--border-radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
-  width: 100%;
-  padding-top: 100%; /* Para hacer el contenedor cuadrado */
-}
-
-.instagram-post-link:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: var(--shadow-lg);
-}
-
-.instagram-post-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover; /* Asegura que la imagen cubra el área sin distorsionarse */
-  transition: transform 0.3s ease;
-}
-
-.instagram-post-link:hover .instagram-post-img {
-  transform: scale(1.05); /* Pequeño zoom al pasar el ratón */
-}
-
-.instagram-section .btn {
-  margin-top: 2rem;
 }
 
 /* Mensajes del Formulario */
