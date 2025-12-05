@@ -206,17 +206,28 @@ body {
 /* Carousel specific styles */
 #heroCarousel {
   margin-top: -120px;
+  aspect-ratio: 4 / 3;
+  max-height: 70vh;
+  min-height: 300px;
+  overflow: hidden;
+  border-radius: var(--border-radius);
+  background-color: var(--bg-light);
+}
+
+#heroCarousel .carousel-inner {
+  height: 100%;
 }
 
 #heroCarousel .carousel-item {
   background-color: transparent;
+  height: 100%;
 }
 
 #heroCarousel .carousel-item img {
   width: 100%;
-  max-height: 70vh;
+  height: 100%;
   object-fit: cover;
-  object-position: center;
+  object-position: center top;
   border-radius: var(--border-radius) !important;
 }
 
@@ -724,10 +735,8 @@ body {
 
   #heroCarousel {
     margin-top: 0;
-  }
-
-  #heroCarousel .carousel-item img {
     max-height: 50vh;
+    min-height: 280px;
   }
 }
 
@@ -752,10 +761,8 @@ body {
 
   #heroCarousel {
     margin-top: 20px;
-  }
-
-  #heroCarousel .carousel-item img {
     max-height: 45vh;
+    min-height: 250px;
   }
 
   .hero-icons-container {
@@ -856,8 +863,9 @@ body {
     height: 100px;
   }
 
-  #heroCarousel .carousel-item img {
+  #heroCarousel {
     max-height: 40vh;
+    min-height: 220px;
   }
 
   .hero-icons-container {
