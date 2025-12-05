@@ -1,3 +1,37 @@
+
+/* Accesibilidad y focus mejorado */
+*:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+button:focus,
+a:focus,
+.btn:focus {
+  box-shadow: 0 0 0 3px rgba(255, 55, 55, 0.3);
+}
+
+/* Mejora contraste en textos */
+.text-muted {
+  color: #6c757d !important;
+}
+
+/* Smooth scroll mejorado */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
 /* Variables CSS para consistencia */
 :root {
   --primary-color: #FF3737;
@@ -78,9 +112,9 @@ body {
 
 .navbar .nav-link {
   color: white !important;
-  font-size: 1.1rem;
+  font-size: clamp(0.95rem, 2vw, 1.1rem);
   font-weight: 500;
-  padding: 0.5rem 1rem !important;
+  padding: 0.75rem 1.25rem !important;
   transition: var(--transition);
   position: relative;
 }
@@ -91,14 +125,21 @@ body {
   bottom: 0;
   left: 50%;
   width: 0;
-  height: 2px;
+  height: 3px;
   background-color: white;
   transition: var(--transition);
   transform: translateX(-50%);
+  border-radius: 2px;
 }
 
-.navbar .nav-link:hover::after {
+.navbar .nav-link:hover::after,
+.navbar .nav-link:focus::after {
   width: 80%;
+}
+
+.navbar .nav-link:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 4px;
 }
 
 .navbar-toggler {
@@ -147,33 +188,44 @@ body {
 }
 
 .hero-title {
-  font-size: 2.5rem;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
   font-weight: 800;
   color: var(--primary-color);
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   line-height: 1.2;
-  text-align: center; /* Explicitly center the text */
+  text-align: center;
 }
 
 .hero-content-left {
   text-align: center;
+  padding: 1rem 0;
 }
 
 .hero-subtitle {
-  font-size: 1.3rem;
+  font-size: clamp(1.1rem, 3vw, 1.3rem);
   color: var(--text-light);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
   font-weight: 500;
+  line-height: 1.4;
 }
 
 .hero-description {
-  font-size: 1.1rem;
+  font-size: clamp(0.95rem, 2.5vw, 1.1rem);
   color: var(--text-dark);
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .hero-description p {
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.hero-description strong {
+  color: var(--primary-color);
+  font-weight: 600;
 }
 
 .hero-image img {
@@ -212,6 +264,7 @@ body {
   overflow: hidden;
   border-radius: var(--border-radius);
   background-color: var(--bg-light);
+  box-shadow: var(--shadow-lg);
 }
 
 #heroCarousel .carousel-inner {
@@ -229,6 +282,21 @@ body {
   object-fit: cover;
   object-position: center top;
   border-radius: var(--border-radius) !important;
+}
+
+#heroCarousel .carousel-control-prev,
+#heroCarousel .carousel-control-next {
+  width: 10%;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+#heroCarousel .carousel-control-prev:hover,
+#heroCarousel .carousel-control-next:hover,
+#heroCarousel .carousel-control-prev:focus,
+#heroCarousel .carousel-control-next:focus {
+  opacity: 1;
+}
 }
 
 /* Sección de Estadísticas */
@@ -861,20 +929,32 @@ body {
   .hero-logo {
     width: 100px;
     height: 100px;
+    margin-top: 10px;
   }
 
   #heroCarousel {
-    max-height: 40vh;
-    min-height: 220px;
+    max-height: 45vh;
+    min-height: 250px;
+    margin-top: -60px;
   }
 
   .hero-icons-container {
-    gap: 0.5rem;
+    gap: 0.75rem;
+    margin-top: 1rem;
   }
 
   .hero-icon {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .hero-content-left {
+    padding: 1.5rem 0.5rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+    padding: 0 1rem;
   }
 
   .about-badge {
@@ -962,18 +1042,18 @@ body {
   }
 
   .whatsapp, .instagram-btn {
-    width: 45px;
-    height: 45px;
-    font-size: 22px;
-    right: 10px;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    right: 15px;
   }
 
   .whatsapp {
-    bottom: 15px;
+    bottom: 20px;
   }
 
   .instagram-btn {
-    bottom: 75px;
+    bottom: 85px;
   }
 
   .expertise-item {
@@ -1056,7 +1136,8 @@ body {
   border: 2px solid transparent;
 }
 
-.operativo-card:hover {
+.operativo-card:hover,
+.operativo-card:focus-within {
   transform: translateY(-10px);
   box-shadow: var(--shadow-lg);
   border-color: var(--accent-color);
@@ -1075,6 +1156,10 @@ body {
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
+}
+
+.operativo-card:focus-within .operativo-image-container img {
+  transform: scale(1.15);
 }
 
 .esterilizacion-image-container img {
