@@ -14,6 +14,9 @@ This is a static website for "Domicilio Vet Valpo," a mobile veterinary service 
 - Removed duplicate carousel slides and restored unique image set (8 distinct images)
 - Enhanced Instagram feed error handling with fallback placeholder when images fail to load
 - Added checkAllFailed() function to show placeholder when all Instagram CDN images are blocked by CORS
+- Fixed carousel layout shift on page load by adding aspect-ratio: 4/3 and min-height constraints
+- Sped up carousel transitions from 3000ms to 2000ms for faster image cycling
+- Improved image framing with object-position: center top for better subject visibility
 
 **November 22, 2025:**
 - Enhanced visual aesthetics with improved color palette, shadows, and gradients
