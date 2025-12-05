@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Atención veterinaria profesional a domicilio en Valparaíso. Consultas, cirugías, esterilización y tratamientos homeopáticos. Dra. Claudia Cárcamo.">
   <meta name="keywords" content="veterinaria valparaíso, veterinario a domicilio, homeopatía veterinaria, esterilización, consulta veterinaria">
   <meta name="theme-color" content="#FF3737">
+  <meta name="author" content="Domicilio Vet Valpo">
+  <meta name="robots" content="index, follow">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
@@ -13,6 +15,7 @@
   <meta property="og:title" content="Domicilio Vet Valpo - Atención Veterinaria a Domicilio">
   <meta property="og:description" content="Atención veterinaria profesional a domicilio en Valparaíso. Consultas, cirugías y tratamientos homeopáticos con la Dra. Claudia Cárcamo.">
   <meta property="og:image" content="https://domiciliovetvalpo.replit.app/assets/hero-section.png">
+  <meta property="og:locale" content="es_CL">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
@@ -20,6 +23,11 @@
   <meta property="twitter:title" content="Domicilio Vet Valpo - Atención Veterinaria a Domicilio">
   <meta property="twitter:description" content="Atención veterinaria profesional a domicilio en Valparaíso. Consultas, cirugías y tratamientos homeopáticos.">
   <meta property="twitter:image" content="https://domiciliovetvalpo.replit.app/assets/hero-section.png">
+
+  <!-- Geo Tags -->
+  <meta name="geo.region" content="CL-VS">
+  <meta name="geo.placename" content="Valparaíso">
+  <meta name="geo.position" content="-33.0473;-71.6056">
 
   <title>Domicilio Vet Valpo - Atención Veterinaria a Domicilio | Dra. Claudia Cárcamo</title>
   <link rel="icon" href="assets/icono.png" type="image/x-icon">
@@ -34,6 +42,47 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet" type="text/css">
+
+  <!-- Schema.org Markup for Local Business -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "VeterinaryClinic",
+    "name": "Domicilio Vet Valpo",
+    "image": "https://domiciliovetvalpo.replit.app/assets/hero-section.png",
+    "description": "Atención veterinaria profesional a domicilio en Valparaíso. Consultas, cirugías y tratamientos homeopáticos.",
+    "url": "https://domiciliovetvalpo.replit.app/",
+    "telephone": "+56965222368",
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Valparaíso",
+      "addressCountry": "CL"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": -33.0473,
+      "longitude": -71.6056
+    },
+    "openingHoursSpecification": {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "08:00",
+      "closes": "20:00"
+    },
+    "sameAs": [
+      "https://www.instagram.com/domicilio.vet.valpo/"
+    ]
+  }
+  </script>
 </head>
 <body>
   <!-- Botones flotantes -->
@@ -599,25 +648,31 @@
         </div>
         <div class="col-lg-6" data-aos="fade-left">
           <div class="contact-form-wrapper">
-            <form id="contactForm" class="contact-form">
+            <form id="contactForm">
+              <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
               <div class="mb-3">
                 <label for="name" class="form-label">Nombre</label>
-                <input type="text" class="form-control" id="name" required>
+                <input type="text" class="form-control" id="name" required aria-label="Nombre completo">
               </div>
               <div class="mb-3">
                 <label for="phone" class="form-label">Teléfono</label>
-                <input type="tel" class="form-control" id="phone" required>
+                <input type="tel" class="form-control" id="phone" required aria-label="Número de teléfono">
               </div>
               <div class="mb-3">
                 <label for="pet" class="form-label">Nombre de tu mascota</label>
-                <input type="text" class="form-control" id="pet" required>
+                <input type="text" class="form-control" id="pet" required aria-label="Nombre de tu mascota">
               </div>
               <div class="mb-3">
                 <label for="message" class="form-label">Mensaje</label>
                 <textarea class="form-control" id="message" rows="4" required></textarea>
               </div>
-              <button type="submit" class="btn btn-primary w-100">
-                <i class="fa fa-whatsapp me-2"></i>Enviar por WhatsApp
+              <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                <span class="btn-text">Enviar por WhatsApp</span>
+                <span class="btn-spinner" style="display: none;">
+                  <svg class="spinner" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="31.4" stroke-dashoffset="10"></circle>
+                  </svg>
+                </span>
               </button>
             </form>
           </div>
@@ -641,6 +696,13 @@
       </div>
     </div>
   </footer>
+
+  <!-- Botón Volver Arriba -->
+  <button id="backToTop" class="back-to-top" aria-label="Volver arriba" title="Volver arriba">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>
 
   <!-- Scripts -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

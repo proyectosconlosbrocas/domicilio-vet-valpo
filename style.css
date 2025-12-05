@@ -1,4 +1,3 @@
-
 /* Accesibilidad y focus mejorado */
 *:focus {
   outline: 3px solid var(--primary-color);
@@ -865,15 +864,15 @@ body {
   .hero-title {
     font-size: 2rem;
   }
-  
+
   .hero-subtitle {
     font-size: 1.1rem;
   }
-  
+
   .section-title {
     font-size: 2rem;
   }
-  
+
   .navbar-brand {
     font-size: 1.2rem;
   }
@@ -893,11 +892,11 @@ body {
   .hero-section {
     padding: 30px 0;
   }
-  
+
   .services-section {
     padding: 40px 0;
   }
-  
+
   .hero-title {
     font-size: 1.75rem;
   }
@@ -923,22 +922,22 @@ body {
     width: 32px;
     height: 32px;
   }
-  
+
   .service-card-image {
     height: 200px;
   }
-  
+
   .whatsapp, .instagram-btn, .back-to-top {
     width: 50px;
     height: 50px;
     font-size: 24px;
     right: 15px;
   }
-  
+
   .whatsapp {
     bottom: 20px;
   }
-  
+
   .instagram-btn {
     bottom: 85px;
   }
@@ -984,6 +983,65 @@ body {
     max-height: 350px;
     object-fit: cover;
   }
+
+  /* Accesibilidad mejorada */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Botón Volver Arriba */
+  .back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+
+  .back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .back-to-top:hover {
+    background: #a31e1e;
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .back-to-top:active {
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 768px) {
+    .back-to-top {
+      bottom: 20px;
+      right: 20px;
+      width: 45px;
+      height: 45px;
+    }
+  }
 }
 
 @media (max-width: 576px) {
@@ -994,15 +1052,15 @@ body {
   .hero-title {
     font-size: 1.4rem;
   }
-  
+
   .hero-subtitle {
     font-size: 0.95rem;
   }
-  
+
   .section-title {
     font-size: 1.5rem;
   }
-  
+
   .hero-description {
     font-size: 0.95rem;
   }
@@ -1456,4 +1514,59 @@ body {
 
 .instagram-section .btn {
   margin-top: 2rem;
+}
+
+/* Mensajes del Formulario */
+.form-message {
+    display: none;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    animation: slideDown 0.3s ease;
+}
+
+.form-message.show {
+    display: block;
+}
+
+.form-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.form-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Spinner del botón */
+.spinner {
+    width: 20px;
+    height: 20px;
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
 }

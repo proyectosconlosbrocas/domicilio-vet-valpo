@@ -1,0 +1,8 @@
+
+User-agent: *
+Allow: /
+
+Sitemap: https://veterinariaclaudiacarcamo.cl/sitemap.xml
+
+# Disallow admin or private directories if any
+# Disallow: /admin/
