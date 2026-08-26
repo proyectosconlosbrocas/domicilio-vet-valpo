@@ -121,6 +121,29 @@ Pedido del dueño del negocio: otra vuelta de diseño visual + revisión de usab
 
 **Checkpoint**: cambios de UX/UI aplicados con justificación funcional en cada uno (no solo estética), sin regresiones — verificado con build + suite E2E + inspección visual.
 
+## Fase 10: Fase 1 (MVP) — mitad web del sistema clínico (P1) — 2026-08-26
+
+- [x] T042 `apps/web` gana React Router: `/` (landing pública sin cambios), `/portal` (login por magic link + dashboard del cliente), `/completar-perfil` (alta de cliente + primera mascota, autenticado). Code-splitting por ruta (`React.lazy`) — el portal no infla el bundle de la landing pública.
+- [x] T043 `PortalLoginForm`: pide el email, llama `signInWithOtp` con `emailRedirectTo` a `/completar-perfil`.
+- [x] T044 `CompletarPerfilPage`: inserta `clientes` (`auth_user_id = auth.uid()`) + primera `mascotas`, con checkbox real de consentimiento de datos (`consentimiento_datos_aceptado`/`consentimiento_fecha`, agregados en el esquema). Self-healing: si el cliente ya existe (choque de unique en `auth_user_id`, o vuelve a este link por error), redirige directo a `/portal`.
+- [x] T045 `PortalPage`: ficha de cada mascota con historial de visitas/vacunas/desparasitaciones **solo lectura** (`MascotaHistoryCard`, expandible), edición de datos de contacto propios (`ContactEditForm`), alta de mascotas nuevas (`NewMascotaForm`) — nunca edita `mascotas` directamente ni sube `foto_url` (según el diseño de RLS: el cliente no tiene `UPDATE` en `mascotas`).
+- [x] T046 Link "Portal de Clientes" agregado al Navbar de la landing (desktop + menú mobile).
+- [x] T047 Verificación end-to-end real: se generó un magic link real vía Admin API (`scripts/generate-test-magiclink.mjs`) sin depender de recibir un email, se inyectó la sesión en el navegador vía `supabase.auth.setSession()` (expuesto en `window.__supabase` solo en modo dev — nunca en el build de producción) y se probó por UI con Playwright el flujo completo: magic link → completar perfil → dashboard con la mascota creada → expandir historial (vacío, sin errores) → editar contacto propio → persiste tras reload. 6/6 pasos sin errores. Datos de prueba limpiados al final (`scripts/cleanup-test-cliente.mjs`).
+- [x] T048 Suite existente de e2e de la landing (`smoke.spec.ts`) sigue 4/4 verde tras agregar el router — sin regresión.
+
+**Hallazgo real durante la verificación, requiere acción manual tuya**: al probar `signInWithOtp` con `emailRedirectTo: '.../completar-perfil'`, Supabase **ignoró silenciosamente esa URL** y redirigió a `http://localhost:3000` (un default de proyecto nuevo, no configurado) — porque las Redirect URLs no están todavía en la lista blanca del proyecto. Para que el magic link real funcione en producción y en local:
+
+1. Dashboard → **Authentication → URL Configuration**.
+2. **Site URL**: `https://domicilio-vet-valpo.vercel.app`.
+3. **Redirect URLs**, agregar:
+   - `http://localhost:5000/completar-perfil` (dev)
+   - `https://domicilio-vet-valpo.vercel.app/completar-perfil` (producción)
+4. Recomendado también antes de exponer el formulario público de verdad: configurar **SMTP propio** (Resend/Postmark) en Authentication → Emails — el proveedor de email built-in de Supabase tiene un límite de pocos envíos por hora que un formulario público real supera rápido.
+
+No pude hacer esto por API — la configuración de URLs de Auth se administra desde el dashboard (o la Management API, que necesita un token distinto al de este proyecto).
+
+**Checkpoint**: MVP completo de las dos mitades (Fase 1 mobile en la Fase 7-9, Fase 1 web acá) verificado de punta a punta contra la base de datos real, con datos de prueba limpiados. Falta el paso manual de Auth URL Configuration arriba antes de que el magic link funcione para clientes reales.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.

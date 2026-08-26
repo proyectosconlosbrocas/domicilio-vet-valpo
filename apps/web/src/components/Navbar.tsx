@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Menu, X, UserCircle } from "lucide-react";
 import { useScrollState } from "@/hooks/use-scroll-state";
 import { useActiveSection } from "@/hooks/use-active-section";
 
@@ -56,6 +57,11 @@ export function Navbar() {
               </a>
             </li>
           ))}
+          <li>
+            <Link to="/portal" className="nav-link flex items-center gap-1.5">
+              <UserCircle size={18} /> Portal de Clientes
+            </Link>
+          </li>
         </ul>
       </div>
 
@@ -73,6 +79,11 @@ export function Navbar() {
               </a>
             </li>
           ))}
+          <li>
+            <Link to="/portal" className="nav-link flex items-center gap-1.5" onClick={() => setMenuOpen(false)}>
+              <UserCircle size={18} /> Portal de Clientes
+            </Link>
+          </li>
         </ul>
       )}
     </nav>
