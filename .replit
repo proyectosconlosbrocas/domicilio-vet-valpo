@@ -1,4 +1,4 @@
-entrypoint = "src/main.tsx"
+entrypoint = "apps/web/src/main.tsx"
 modules = ["web", "nodejs-20", "python-3.12"]
 
 [nix]
@@ -7,8 +7,8 @@ packages = ["imagemagick"]
 
 [deployment]
 deploymentTarget = "static"
-build = ["npm", "run", "build"]
-publicDir = "dist"
+build = ["npm", "run", "build:web"]
+publicDir = "apps/web/dist"
 
 [workflows]
 runButton = "Project"
@@ -31,7 +31,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "npm install && npm run dev"
+args = "npm install && npm run dev:web"
 waitForPort = 5000
 
 [[ports]]

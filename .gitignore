@@ -5,3 +5,9 @@ playwright-report/
 blob-report/
 playwright/.cache/
 *.tsbuildinfo
+
+# Secretos — nunca al repo
+.env
+.env.*
+!.env.example
+supabase/.temp/
