@@ -31,6 +31,7 @@ export interface Database {
           activo?: boolean;
           created_at?: string;
         };
+        Relationships: [];
       };
       clientes: {
         Row: {
@@ -68,6 +69,7 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["clientes"]["Insert"]>;
+        Relationships: [];
       };
       mascotas: {
         Row: {
@@ -113,6 +115,15 @@ export interface Database {
           updated_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["mascotas"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "mascotas_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       visitas: {
         Row: {
@@ -148,6 +159,15 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["visitas"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "visitas_mascota_id_fkey";
+            columns: ["mascota_id"];
+            isOneToOne: false;
+            referencedRelation: "mascotas";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       vacunas: {
         Row: {
@@ -173,6 +193,15 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["vacunas"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "vacunas_mascota_id_fkey";
+            columns: ["mascota_id"];
+            isOneToOne: false;
+            referencedRelation: "mascotas";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       desparasitaciones: {
         Row: {
@@ -196,6 +225,15 @@ export interface Database {
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["desparasitaciones"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "desparasitaciones_mascota_id_fkey";
+            columns: ["mascota_id"];
+            isOneToOne: false;
+            referencedRelation: "mascotas";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       documentos: {
         Row: {
@@ -219,6 +257,22 @@ export interface Database {
           created_by?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["documentos"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "documentos_mascota_id_fkey";
+            columns: ["mascota_id"];
+            isOneToOne: false;
+            referencedRelation: "mascotas";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "documentos_visita_id_fkey";
+            columns: ["visita_id"];
+            isOneToOne: false;
+            referencedRelation: "visitas";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: Record<string, never>;
