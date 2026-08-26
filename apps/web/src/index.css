@@ -1,0 +1,42 @@
+@import "./styles/legacy.css";
+
+@tailwind base;
+@tailwind components;
+
+/* Tokens de tema para los primitivos de shadcn/ui, mapeados a la paleta de
+   marca (--primary-color #FF3737 y compañía viven en legacy.css). */
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 210 29% 24%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 210 29% 24%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 29% 24%;
+
+    --primary: 0 100% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 4 100% 95%;
+    --secondary-foreground: 0 100% 61%;
+
+    --muted: 0 43% 97%;
+    --muted-foreground: 217 11% 40%;
+
+    --accent: 4 100% 95%;
+    --accent-foreground: 0 100% 61%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 4 45% 92%;
+    --input: 4 45% 92%;
+    --ring: 0 100% 61%;
+
+    --radius: 0.85rem;
+  }
+}
+
+@tailwind utilities;
