@@ -23,20 +23,24 @@ a:focus,
   box-shadow: 0 0 0 4px rgba(255, 55, 55, 0.4);
 }
 
-/* Skip to main content para accesibilidad */
+/* Skip to main content para accesibilidad. Fondo oscuro (no el rojo del
+   navbar) para que se distinga con claridad al recibir foco por teclado. */
 .skip-to-main {
   position: absolute;
-  top: -40px;
-  left: 0;
-  background: var(--primary-color);
+  top: -60px;
+  left: 1rem;
+  background: var(--text-dark);
   color: white;
-  padding: 8px;
+  padding: 0.75rem 1.25rem;
+  border-radius: var(--button-radius);
   text-decoration: none;
-  z-index: 100;
+  font-weight: 600;
+  z-index: 2000;
+  transition: top 0.2s ease;
 }
 
 .skip-to-main:focus {
-  top: 0;
+  top: 1rem;
 }
 
 /* Mejora contraste en textos */
@@ -102,6 +106,7 @@ a:focus,
   --border-radius: 20px;
   --border-radius-sm: 14px;
   --border-radius-pill: 999px;
+  --button-radius: 12px;
 }
 
 body {
@@ -191,8 +196,13 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .navbar .nav-link:hover::after,
-.navbar .nav-link:focus::after {
+.navbar .nav-link:focus::after,
+.navbar .nav-link.active::after {
   width: 80%;
+}
+
+.navbar .nav-link.active {
+  font-weight: 700;
 }
 
 .navbar .nav-link:focus {
@@ -329,6 +339,35 @@ h1, h2, h3, h4, h5, h6,
   display: flex;
   justify-content: center;
   gap: 1rem;
+}
+
+/* En desktop el texto del hero pasa a alineado a la izquierda — más
+   editorial/legible que centrado, que queda mejor reservado para mobile
+   donde el bloque de texto es angosto. */
+@media (min-width: 992px) {
+  .hero-content-left,
+  .hero-title {
+    text-align: left;
+  }
+
+  .hero-eyebrow {
+    margin-left: 0;
+  }
+
+  .hero-description {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .hero-cta-row,
+  .hero-hours {
+    justify-content: flex-start;
+  }
+
+  .hero-logo {
+    margin-left: 0;
+    margin-right: auto;
+  }
 }
 
 .hero-icon {
@@ -763,7 +802,7 @@ h1, h2, h3, h4, h5, h6,
   border: none;
   padding: 12px 30px;
   font-weight: 600;
-  border-radius: var(--border-radius-pill);
+  border-radius: var(--button-radius);
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
 }
@@ -785,7 +824,7 @@ h1, h2, h3, h4, h5, h6,
   background: transparent;
   padding: 10px 28px;
   font-weight: 600;
-  border-radius: var(--border-radius-pill);
+  border-radius: var(--button-radius);
   transition: var(--transition);
 }
 
@@ -803,7 +842,7 @@ h1, h2, h3, h4, h5, h6,
   border: none;
   padding: 12px 30px;
   font-weight: 600;
-  border-radius: var(--border-radius-pill);
+  border-radius: var(--button-radius);
   transition: var(--transition);
   box-shadow: 0 10px 24px rgba(37, 211, 102, 0.35);
 }
@@ -826,7 +865,7 @@ h1, h2, h3, h4, h5, h6,
   border: none;
   padding: 12px 24px;
   font-weight: 600;
-  border-radius: var(--border-radius-pill);
+  border-radius: var(--button-radius);
   transition: var(--transition);
   text-decoration: none;
   display: inline-flex;
@@ -851,6 +890,40 @@ h1, h2, h3, h4, h5, h6,
 .btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* Barra de conversión fija en mobile (reemplaza al botón redondo de WhatsApp) */
+.mobile-cta-bar {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-cta-bar {
+    display: block;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: var(--bg-white);
+    box-shadow: 0 -8px 24px rgba(30, 20, 20, 0.12);
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+
+  .mobile-cta-bar.show {
+    transform: translateY(0);
+  }
+
+  .mobile-cta-bar .btn {
+    padding: 12px 20px;
+  }
+
+  /* El botón flotante redondo de WhatsApp queda reemplazado por la barra en mobile */
+  .whatsapp {
+    display: none;
+  }
 }
 
 /* Botones flotantes */
@@ -959,6 +1032,15 @@ h1, h2, h3, h4, h5, h6,
   color: rgba(255, 255, 255, 0.85);
   margin-top: 50px;
   padding: 2.5rem 0;
+}
+
+/* La barra de conversión fija queda por encima del footer en mobile una vez
+   que se pasó el umbral de scroll — se le agrega aire abajo para que el
+   copyright y los íconos de redes no queden tapados. */
+@media (max-width: 768px) {
+  .footer {
+    padding-bottom: calc(2.5rem + 70px + env(safe-area-inset-bottom));
+  }
 }
 
 .footer p {
@@ -1072,16 +1154,15 @@ h1, h2, h3, h4, h5, h6,
     right: 15px;
   }
 
-  .whatsapp {
-    bottom: 20px;
-  }
-
+  /* .whatsapp queda display:none en mobile (ver "Barra de conversión fija"),
+     instagram-btn y back-to-top suben para no quedar tapados por esa barra
+     (que puede llegar a ~90px de alto con el safe-area de notch/home indicator). */
   .instagram-btn {
-    bottom: 85px;
+    bottom: 100px;
   }
 
   .back-to-top {
-    bottom: 150px;
+    bottom: 165px;
   }
 
   .contact-form-wrapper {
@@ -1247,12 +1328,8 @@ h1, h2, h3, h4, h5, h6,
     right: 15px;
   }
 
-  .whatsapp {
-    bottom: 20px;
-  }
-
   .instagram-btn {
-    bottom: 85px;
+    bottom: 100px;
   }
 
   .expertise-item {
@@ -1471,7 +1548,7 @@ h1, h2, h3, h4, h5, h6,
   padding: 14px 28px;
   font-weight: 600;
   font-size: 1rem;
-  border-radius: 50px;
+  border-radius: var(--button-radius);
   transition: var(--transition);
   text-decoration: none;
   display: inline-flex;

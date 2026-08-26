@@ -106,6 +106,21 @@ Pedido explícito del dueño del negocio, confirmado tras advertirle que contrad
 - [x] T032 Instalados a nivel proyecto (`.mcp.json`, commiteado): Playwright, GitHub, Context7, Chrome DevTools, Vercel.
 - [ ] T033 **Pendiente, requiere al usuario**: autorizar por OAuth los MCPs de GitHub y Vercel (sesión no interactiva, no se puede completar el flujo de navegador desde acá) — necesario antes de poder crear PRs o gestionar deploys desde Claude Code.
 
+## Fase 9: UX/UI — segunda pasada (P2) — 2026-08-26
+
+Pedido del dueño del negocio: otra vuelta de diseño visual + revisión de usabilidad/accesibilidad + nuevas funcionalidades UX (no feedback puntual).
+
+- [x] T034 Accesibilidad: skip-link real (`.skip-to-main` ya existía en CSS pero nadie lo renderizaba — quedó cableado a `<main id="main-content">`), con fondo oscuro dedicado en vez del rojo del navbar para que se note al recibir foco.
+- [x] T035 Accesibilidad: carrusel del hero navegable con flechas de teclado (←/→) y anuncio `aria-live` del slide actual para lectores de pantalla (`role="region"`, `aria-roledescription="carrusel"`).
+- [x] T036 Accesibilidad: botón del menú móvil con `aria-controls` apuntando a la lista, label en español más descriptivo.
+- [x] T037 Nueva funcionalidad UX: scroll-spy (`useActiveSection`) — el link activo del navbar se resalta (negrita + subrayado) según la sección visible, sin agregar un listener de scroll adicional (reusa IntersectionObserver).
+- [x] T038 Nueva funcionalidad UX: barra de conversión fija en mobile (`MobileCtaBar`) — reemplaza al botón flotante redondo de WhatsApp en viewports chicos (un CTA de ancho completo convierte mejor que un círculo de 50px en la esquina), aparece tras el mismo umbral de scroll que "volver arriba". Bug real detectado y corregido en el proceso: el `padding-bottom` que le da aire al footer para que la barra no tape los íconos de redes estaba declarado *antes* que la regla base `.footer` en el CSS, así que el shorthand `padding: 2.5rem 0` lo pisaba — reubicado después.
+- [x] T039 Rediseño visual: hero alineado a la izquierda en desktop (`≥992px`) en vez de centrado — más editorial y legible; se mantiene centrado en mobile donde el bloque de texto es angosto.
+- [x] T040 Rediseño visual: los botones CTA (`.btn-primary`, `.btn-outline-primary`, `.btn-whatsapp`, `.btn-service`, `.operativo-cta`) pasan de radio "pill" (999px) a un radio estructurado de 12px (`--button-radius`) — menos "plantilla SaaS genérica". Los badges/tags (`.hero-eyebrow`, `.about-badge`, `.operativo-badge`) mantienen la forma pill, que sí les corresponde.
+- [x] T041 `npm run build` limpio + `npx playwright test` 4/4 (se actualizó un test cuyo selector apuntaba al `aria-label` en inglés del botón de menú, cambiado a español en T036) + verificación visual desktop/mobile con Playwright.
+
+**Checkpoint**: cambios de UX/UI aplicados con justificación funcional en cada uno (no solo estética), sin regresiones — verificado con build + suite E2E + inspección visual.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.

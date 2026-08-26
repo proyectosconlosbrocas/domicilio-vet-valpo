@@ -60,7 +60,7 @@ test("el menú móvil se cierra al hacer click en un link", async ({ page }) => 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/");
 
-  await page.getByRole("button", { name: /toggle navigation/i }).click();
+  await page.getByRole("button", { name: /abrir menú de navegación/i }).click();
   const mobileServicesLink = page.locator("ul.flex.flex-col a", { hasText: "Servicios" });
   await expect(mobileServicesLink).toBeVisible();
 

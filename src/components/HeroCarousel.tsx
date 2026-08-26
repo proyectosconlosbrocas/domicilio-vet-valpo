@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type KeyboardEvent } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -24,8 +24,30 @@ export function HeroCarousel() {
     };
   }, [emblaApi]);
 
+  // Flechas del teclado cuando el carrusel tiene foco (mismo patrón que
+  // Bootstrap/embla no dan gratis: hay que cablearlo a mano).
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      scrollPrev();
+    } else if (event.key === "ArrowRight") {
+      event.preventDefault();
+      scrollNext();
+    }
+  }
+
+  const currentAlt = heroCarouselImages[selectedIndex]?.alt ?? "";
+
   return (
-    <div className="hero-carousel" ref={emblaRef}>
+    <div
+      className="hero-carousel"
+      ref={emblaRef}
+      role="region"
+      aria-roledescription="carrusel"
+      aria-label="Fotos de Domicilio Vet Valpo"
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+    >
       <div className="flex h-full">
         {heroCarouselImages.map((image) => (
           <div className="embla__slide" key={image.src}>
@@ -33,6 +55,12 @@ export function HeroCarousel() {
           </div>
         ))}
       </div>
+
+      {/* Anuncio para lectores de pantalla del slide actual, sin duplicar
+          visualmente el alt de cada <img> (ya visible/leído por su cuenta). */}
+      <span className="sr-only" aria-live="polite">
+        {`Foto ${selectedIndex + 1} de ${heroCarouselImages.length}: ${currentAlt}`}
+      </span>
 
       <button
         type="button"
