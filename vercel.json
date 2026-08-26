@@ -1,5 +1,5 @@
 {
   "buildCommand": "npm run build:web",
   "outputDirectory": "apps/web/dist",
-  "installCommand": "npm install"
+  "installCommand": "rm -rf node_modules package-lock.json apps/*/node_modules packages/*/node_modules && npm install"
 }
