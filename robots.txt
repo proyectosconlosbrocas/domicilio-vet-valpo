@@ -2,7 +2,7 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://veterinariaclaudiacarcamo.cl/sitemap.xml
+Sitemap: https://domicilio-vet-valpo.vercel.app/sitemap.xml
 
 # Disallow admin or private directories if any
 # Disallow: /admin/

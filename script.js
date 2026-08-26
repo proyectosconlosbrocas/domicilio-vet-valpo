@@ -5,31 +5,70 @@ AOS.init({
   offset: 100
 });
 
-// Botón Volver Arriba
-function initBackToTop() {
-    const backToTopButton = document.getElementById('backToTop');
+// Feed de Instagram: carga instagram_posts.json (generado por instagram_fetcher.py)
+// y renderiza un grid de miniaturas. Es tolerante a ambos formatos que ese script
+// puede producir (image_local_url + post_page_url, o solo url) y a que el archivo
+// no exista o esté vacío. Las URLs directas del CDN de Instagram son firmadas y
+// caducan a los pocos días, y Instagram suele bloquear el hotlinking por CORS: si
+// una imagen falla se oculta solo esa miniatura, y si fallan todas se oculta el
+// grid completo y queda únicamente el botón "Síguenos en Instagram".
+function initInstagramFeed() {
+  const grid = document.getElementById('instagramGrid');
+  if (!grid) return;
 
-    if (!backToTopButton) return;
+  fetch('instagram_posts.json')
+    .then(response => (response.ok ? response.json() : []))
+    .then(posts => {
+      if (!Array.isArray(posts) || posts.length === 0) return;
 
-    // Mostrar/ocultar botón según scroll
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            backToTopButton.classList.add('visible');
-        } else {
-            backToTopButton.classList.remove('visible');
+      let loadedCount = 0;
+      let failedCount = 0;
+      const total = posts.length;
+
+      posts.forEach(post => {
+        const imageUrl = post.image_local_url || post.url;
+        if (!imageUrl) {
+          failedCount++;
+          return;
         }
-    });
 
-    // Volver arriba al hacer click
-    backToTopButton.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+        const link = document.createElement('a');
+        link.className = 'instagram-grid-item';
+        link.href = post.post_page_url || 'https://www.instagram.com/domicilio.vet.valpo/';
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.setAttribute('aria-label', 'Ver publicación en Instagram');
+
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.alt = 'Publicación de Domicilio Vet Valpo en Instagram';
+        img.loading = 'lazy';
+
+        img.addEventListener('load', () => {
+          loadedCount++;
         });
+
+        img.addEventListener('error', () => {
+          failedCount++;
+          link.remove();
+          // Si ya se resolvieron todas y ninguna cargó, ocultar el grid vacío
+          if (failedCount === total && loadedCount === 0) {
+            grid.innerHTML = '';
+          }
+        });
+
+        link.appendChild(img);
+        grid.appendChild(link);
+      });
+    })
+    .catch(() => {
+      // Sin conexión, archivo ausente o JSON inválido: no se muestra el grid,
+      // el botón de seguir sigue disponible.
     });
 }
 
-// Manejo del formulario de contacto con feedback
+// Manejo del formulario de contacto: arma el mensaje y abre WhatsApp,
+// con feedback visual (spinner + mensaje de estado) durante el envío.
 function initContactForm() {
     const form = document.getElementById('contactForm');
     const messageDiv = document.getElementById('formMessage');
@@ -39,46 +78,46 @@ function initContactForm() {
 
     if (!form) return;
 
-    form.addEventListener('submit', async function(e) {
+    form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        // Mostrar spinner y deshabilitar botón
+        const name = document.getElementById('name').value;
+        const phone = document.getElementById('phone').value;
+        const pet = document.getElementById('pet').value;
+        const message = document.getElementById('message').value;
+
+        // Mostrar spinner y deshabilitar botón mientras se prepara el envío
         submitBtn.disabled = true;
         btnText.style.display = 'none';
         btnSpinner.style.display = 'inline-block';
         messageDiv.className = 'form-message';
         messageDiv.textContent = '';
 
-        // Simular envío (aquí integrarías con tu backend)
-        try {
-            // Simular delay de envío
-            await new Promise(resolve => setTimeout(resolve, 1500));
+        const whatsappMessage = `Hola, mi nombre es ${name}. Mi mascota se llama ${pet}. ${message}. Mi teléfono es ${phone}.`;
+        const whatsappURL = `https://wa.me/56965222368?text=${encodeURIComponent(whatsappMessage)}`;
 
-            // Mostrar mensaje de éxito
+        // Pequeño delay para mejor UX antes de abrir WhatsApp
+        setTimeout(() => {
+            window.open(whatsappURL, '_blank');
+
+            // Mostrar mensaje de éxito real (el usuario fue redirigido a WhatsApp)
             messageDiv.className = 'form-message success show';
-            messageDiv.textContent = '¡Mensaje enviado exitosamente! Te contactaremos pronto.';
+            messageDiv.textContent = '¡Listo! Te estamos redirigiendo a WhatsApp para continuar la conversación.';
 
-            // Limpiar formulario
             form.reset();
+
+            // Restaurar botón
+            submitBtn.disabled = false;
+            btnText.style.display = 'inline';
+            btnSpinner.style.display = 'none';
 
             // Ocultar mensaje después de 5 segundos
             setTimeout(() => {
                 messageDiv.classList.remove('show');
             }, 5000);
-
-        } catch (error) {
-            // Mostrar mensaje de error
-            messageDiv.className = 'form-message error show';
-            messageDiv.textContent = 'Hubo un error al enviar el mensaje. Por favor, intenta nuevamente.';
-        } finally {
-            // Restaurar botón
-            submitBtn.disabled = false;
-            btnText.style.display = 'inline';
-            btnSpinner.style.display = 'none';
-        }
+        }, 800);
     });
 }
-
 
 document.addEventListener('DOMContentLoaded', function() {
   // Cerrar menú móvil al hacer clic en un enlace
@@ -94,10 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-
-
   // Cambiar estilo de navbar al hacer scroll y mostrar botón volver arriba
-  let lastScroll = 0;
   const navbar = document.querySelector('.navbar');
   const backToTopBtn = document.getElementById('backToTop');
 
@@ -111,13 +147,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Mostrar/ocultar botón volver arriba
-    if (currentScroll > 300) {
-      backToTopBtn.classList.add('show');
-    } else {
-      backToTopBtn.classList.remove('show');
+    if (backToTopBtn) {
+      if (currentScroll > 300) {
+        backToTopBtn.classList.add('show');
+      } else {
+        backToTopBtn.classList.remove('show');
+      }
     }
-
-    lastScroll = currentScroll;
   });
 
   // Funcionalidad del botón volver arriba
@@ -130,49 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Manejar envío del formulario de contacto
-  const contactForm = document.getElementById('contactForm');
-  if (contactForm) {
-    contactForm.addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const submitBtn = contactForm.querySelector('button[type="submit"]');
-      const originalText = submitBtn.innerHTML;
-
-      // Mostrar estado de envío
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Enviando...';
-      submitBtn.style.opacity = '0.7';
-
-      const name = document.getElementById('name').value;
-      const phone = document.getElementById('phone').value;
-      const pet = document.getElementById('pet').value;
-      const message = document.getElementById('message').value;
-
-      const whatsappMessage = `Hola, mi nombre es ${name}. Mi mascota se llama ${pet}. ${message}. Mi teléfono es ${phone}.`;
-      const whatsappURL = `https://wa.me/56965222368?text=${encodeURIComponent(whatsappMessage)}`;
-
-      // Simular un pequeño delay para mejor UX
-      setTimeout(() => {
-        window.open(whatsappURL, '_blank');
-
-        // Mostrar éxito
-        submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>¡Enviado!';
-        submitBtn.style.background = 'var(--success-color)';
-
-        setTimeout(() => {
-          contactForm.reset();
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = originalText;
-          submitBtn.style.opacity = '1';
-          submitBtn.style.background = '';
-        }, 2000);
-      }, 500);
-    });
-  }
-
-  
-  // Llamar a las funciones de inicialización
-  initBackToTop();
+  // Inicializar formulario de contacto y feed de Instagram
   initContactForm();
+  initInstagramFeed();
 });
