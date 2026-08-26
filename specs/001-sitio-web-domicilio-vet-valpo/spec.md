@@ -4,7 +4,7 @@
 
 **Created**: 2026-08-26
 
-**Status**: Documentado (as-built — reingeniería inversa del sitio ya implementado en `index.html`, `style.css`, `script.js`)
+**Status**: Documentado (as-built). Este documento describe **objetivos, secciones, requisitos y user stories** del sitio, que no cambiaron con la migración de stack del 2026-08-26 (de HTML/CSS/JS estático a React + Vite + Tailwind + shadcn/ui). Para la implementación técnica vigente ver [plan.md](plan.md) y `.specify/memory/constitution.md` (v2.0.0).
 
 **Input**: "Organiza y documenta con spec-kit todo el proyecto: cada menú, cada sección de la página, los objetivos de la página, etc."
 
@@ -38,7 +38,9 @@ Botones flotantes persistentes (fuera del navbar, visibles en todo el scroll): W
 
 ## Inventario de secciones *(mandatory)*
 
-Cada sección de `index.html`, en orden de aparición:
+> Los links de línea (`index.html#L...`) de esta sección apuntan al `index.html` **pre-migración** (sitio estático, ver historial de git) — el contenido y el orden descritos siguen vigentes, pero la implementación actual vive componentizada en `src/components/*.tsx` (ver tabla de porteo en el plan de migración, `plan.md`). Mapeo rápido: Navbar→`Navbar.tsx`, Hero→`Hero.tsx`/`HeroCarousel.tsx`, Servicios→`Services.tsx`/`ServiceCard.tsx`, Operativos→`Operativos.tsx`/`OperativoCard.tsx`, Sobre Mí→`About.tsx`, Instagram→`InstagramFeed.tsx`, Contacto→`Contact.tsx`/`ContactForm.tsx`, Footer→`Footer.tsx`.
+
+Cada sección de `index.html`, en orden de aparición (referencia histórica pre-migración):
 
 ### 1. Botones flotantes — [index.html:88-107](index.html#L88-L107)
 WhatsApp (mensaje predefinido genérico), Instagram, y botón "volver arriba" (versión con ícono `bi-arrow-up-circle-fill`, ver sección 10 sobre duplicado).

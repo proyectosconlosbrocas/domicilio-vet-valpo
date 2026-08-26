@@ -80,7 +80,33 @@ description: "Backlog de mejoras del sitio Domicilio Vet Valpo, derivado de los 
 
 **Checkpoint**: Rediseño visual aplicado sin cambiar la estructura de secciones ni el contenido de negocio; dos bugs reales (`.contact-form`, llave huérfana) y un problema de accesibilidad (carrusel sin controles) corregidos de paso.
 
+## Fase 7: Migración a React + Vite + Tailwind + shadcn/ui (P1) — 2026-08-26
+
+Pedido explícito del dueño del negocio, confirmado tras advertirle que contradice el Principio I original de la Constitución (v1.0.0, "Sitio Estático, Sin Build"). Ver `.specify/memory/constitution.md` v2.0.0 (Principio I reescrito + registro de excepción) y `plan.md` (Technical Context/Project Structure actualizados). Plan completo ejecutado: `C:\Users\Usuario\.claude\plans\melodic-purring-fox.md`.
+
+- [x] T018 Scaffold Vite + React + TypeScript (`package.json`, `vite.config.ts`, `tsconfig*.json`, `tailwind.config.ts`, `postcss.config.js`, `components.json`).
+- [x] T019 `assets/`, `instagram_posts.json`, `robots.txt`, `sitemap.xml` movidos a `public/` (`git mv`, historia preservada). Nuevo `index.html` mínimo de Vite con todos los meta tags/JSON-LD conservados.
+- [x] T020 CSS híbrido: `style.css` portado a `src/styles/legacy.css` (+ base `.btn`/`.btn-lg` agregada porque Bootstrap ya no está para proveerla) e importado en `src/index.css` junto a las capas de Tailwind y las variables de tema de shadcn/ui mapeadas a la paleta de marca.
+- [x] T021 Primitivos de shadcn/ui escritos a mano en `src/components/ui/` (`button`, `input`, `textarea`, `label`, `card`) — sin correr el wizard interactivo `shadcn init` (no viable en shell no interactiva).
+- [x] T022 `HeroCarousel.tsx` con `embla-carousel-react` + `embla-carousel-autoplay` (reemplaza el carrusel imperativo de Bootstrap), controles prev/next e indicadores hechos a mano.
+- [x] T023 Componentes de página: `Navbar`, `FloatingButtons` (un solo botón `backToTop` — el bug de id duplicado del sitio estático deja de ser posible por construcción), `Hero`, `Services`/`ServiceCard` (data-driven, variant `photo`/`icon-only`), `Operativos`/`OperativoCard`, `About`, `InstagramFeed` (mismo fetch + fallback silencioso), `Contact`/`ContactForm` (un solo handler de submit — el bug de doble listener también deja de ser posible por construcción), `Footer`.
+- [x] T024 `src/lib/whatsapp.ts`: única fuente de verdad para las 10 URLs de WhatsApp del sitio (`buildWhatsappLink`/`buildWhatsappMessage`) — se detectó que 2 de las 10 originales tenían codificación UTF-8 mixta (no percent-encoded); ahora las 10 se generan uniformemente.
+- [x] T025 `useInView` (IntersectionObserver nativo) reemplaza AOS; `useScrollState` centraliza el listener de scroll (navbar `scrolled` + `back-to-top`).
+- [x] T026 Se retiraron por completo Bootstrap 5 (CSS+JS), Bootstrap Icons, Font Awesome 4.7.0 (CDN) y AOS. Layout reconstruido con utilities de Tailwind sección por sección.
+- [x] T027 `vercel.json` actualizado a build moderno (`npm run build` → `dist/`, framework `vite`, sin el config legacy `builds`/`@vercel/static`). `.replit` actualizado (`npm install && npm run dev`, con `--host 0.0.0.0 --port 5000`).
+- [x] T028 `e2e/smoke.spec.ts` (Playwright): carga de página, los 10 hrefs de WhatsApp correctos, el formulario compone el mensaje esperado y abre WhatsApp, el menú móvil se cierra al hacer click.
+- [x] T029 `npm run build` limpio (0 errores TS). Verificado visualmente (desktop 1400px + mobile 390px, con Playwright vía script directo — el MCP recién instalado necesita reinicio de sesión para conectarse, ver T033) contra las capturas tomadas antes de la migración: hero, servicios (foto + icon-only), operativos, sobre mí, instagram (fallback silencioso), contacto y footer — visualmente equivalentes.
+- [x] T030 `npx playwright test` — 4/4 tests pasando. En el primer intento fallaron 2: (a) el test asumía que los 12 enlaces `wa.me` llevan mensaje, sin contar que "Agendar Consulta" (Sobre Mí) y el link de la ficha de contacto son bare a propósito, igual que en el sitio original — de paso se detectó que el porteo le había agregado sin querer un mensaje a "Agendar Consulta" que el original no tenía, revertido; (b) el test verificaba el mensaje de éxito del formulario después de varias aserciones, arriesgando la carrera contra el auto-ocultado a los 5s — reordenado.
+- [x] T031 Commit local de la migración en la rama `migrate-react-vite-tailwind-shadcn`. Push, PR y deploy a Vercel quedan pendientes — requieren autorización OAuth de los MCPs de GitHub/Vercel (ver Fase 8) y una decisión explícita del dueño del negocio antes de tocar producción.
+
+**Checkpoint**: sitio migrado a React+Vite+Tailwind+shadcn/ui manteniendo el 100% del contenido, la estructura de secciones y el diseño visual ya afinado; de paso, 2 clases de bug del sitio estático (id duplicado, doble submit listener) quedan estructuralmente imposibles de reintroducir.
+
+## Fase 8: MCPs de proyecto (P2) — 2026-08-26
+
+- [x] T032 Instalados a nivel proyecto (`.mcp.json`, commiteado): Playwright, GitHub, Context7, Chrome DevTools, Vercel.
+- [ ] T033 **Pendiente, requiere al usuario**: autorizar por OAuth los MCPs de GitHub y Vercel (sesión no interactiva, no se puede completar el flujo de navegador desde acá) — necesario antes de poder crear PRs o gestionar deploys desde Claude Code.
+
 ## Notes
 
-- Ninguna de estas tareas requiere introducir un framework, backend o build step: todas se resuelven editando directamente `index.html`, `style.css`, `script.js`, `robots.txt` o `sitemap.xml`, en línea con el Principio I de la [Constitución](../../.specify/memory/constitution.md).
+- Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
 - Al completar una tarea, marcar su checkbox y actualizar la sección "Issues conocidos" de [spec.md](spec.md) para que ambos documentos queden sincronizados.

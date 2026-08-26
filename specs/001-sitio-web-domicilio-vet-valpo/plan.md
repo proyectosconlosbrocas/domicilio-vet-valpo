@@ -1,46 +1,46 @@
 # Implementation Plan: Sitio Web Domicilio Vet Valpo
 
-**Branch**: `main` | **Date**: 2026-08-26 | **Spec**: [spec.md](spec.md)
+**Branch**: `migrate-react-vite-tailwind-shadcn` | **Date**: 2026-08-26 (v2, migración) | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `specs/001-sitio-web-domicilio-vet-valpo/spec.md`
 
-**Note**: Este plan describe la implementación **ya existente** (as-built), no una a construir. Sirve como referencia técnica para cualquier cambio futuro y como gate de la Constitución del proyecto.
+**Note**: Este plan describe la implementación **ya existente** (as-built) después de la migración a React + Vite + Tailwind + shadcn/ui. La versión anterior (sitio 100% estático sin build) queda documentada en el historial de git y en `.specify/memory/constitution.md` (registro de excepción, v2.0.0).
 
 ## Summary
 
-Sitio de una página (SPA por anclas), 100% estático, sin backend ni base de datos, cuyo único objetivo de conversión es dirigir al usuario a WhatsApp. Construido con HTML5/CSS3/JS vanilla + Bootstrap 5.3.3 vía CDN, sin paso de build.
+Sitio de una página (SPA por anclas, sin router), sin backend ni base de datos, cuyo único objetivo de conversión sigue siendo dirigir al usuario a WhatsApp. Construido con React 18 + TypeScript + Vite 6, Tailwind CSS + primitivos de shadcn/ui, y el CSS bespoke del sitio original portado casi intacto como `src/styles/legacy.css`.
 
 ## Technical Context
 
-**Language/Version**: HTML5, CSS3, JavaScript (ES6, sin transpilar), Python 3 (solo para el script auxiliar `instagram_fetcher.py`, no forma parte del sitio servido).
+**Language/Version**: TypeScript (React 18, Vite 6), Python 3 (solo para el script auxiliar `instagram_fetcher.py`, no forma parte del build).
 
-**Primary Dependencies**: Bootstrap 5.3.3 (CSS + JS bundle), Bootstrap Icons 1.11.1, Font Awesome 4.7.0, AOS 2.3.1 — todas cargadas desde CDN (`cdn.jsdelivr.net`, `stackpath.bootstrapcdn.com`, `unpkg.com`), ninguna instalada vía npm. `instaloader` (Python) solo para `instagram_fetcher.py`.
+**Primary Dependencies**: React, Vite, Tailwind CSS 3 + `tailwindcss-animate`, shadcn/ui (componentes copiados a `src/components/ui/`, no npm package), `embla-carousel-react` + `embla-carousel-autoplay` (carrusel del hero), `lucide-react` (iconografía UI), `react-icons/fa` (glifos de marca WhatsApp/Instagram), `class-variance-authority` + `clsx` + `tailwind-merge` (utilidades de shadcn). `instaloader` (Python) solo para `instagram_fetcher.py`.
 
-**Storage**: N/A — no hay base de datos ni backend. El formulario de contacto no persiste datos, solo los reformatea en una URL `wa.me`.
+**Storage**: N/A — no hay base de datos ni backend. El formulario de contacto no persiste datos, solo los reformatea en una URL `wa.me` vía `src/lib/whatsapp.ts`.
 
-**Testing**: No hay suite de tests automatizada. Verificación actual es manual/visual (abrir el sitio, probar el flujo de WhatsApp).
+**Testing**: `@playwright/test` — smoke test E2E en `e2e/smoke.spec.ts` (carga de página, los 10 hrefs de WhatsApp son correctos, el formulario compone el mensaje esperado, el menú móvil se cierra al hacer click). Playwright MCP disponible para verificación interactiva adicional.
 
-**Target Platform**: Navegador web, mobile-first. **Producción: Vercel** (`vercel.json`, estático, dominio `domicilio-vet-valpo.vercel.app` — confirmado 2026-08-26). Desarrollo/preview local vía Replit (`python -m http.server 5000` o `static-web-server`, ver `.replit`), que se conserva para ese uso.
+**Target Platform**: Navegador web, mobile-first. **Producción: Vercel** (`vercel.json`, `npm run build` → `dist/`, framework `vite`, dominio `domicilio-vet-valpo.vercel.app`). Desarrollo/preview local vía Replit (`.replit`, `npm run dev`, puerto 5000, `--host 0.0.0.0` para que el proxy de Replit vea el server).
 
-**Project Type**: Sitio web de marketing/informativo de una sola página.
+**Project Type**: Sitio web de marketing/informativo de una sola página (SPA sin rutas).
 
-**Performance Goals**: Carga rápida sin build step; `preconnect` a los CDNs de Bootstrap para reducir latencia de DNS; imágenes bajo el pliegue con `loading="lazy"`.
+**Performance Goals**: Vite con code-splitting/tree-shaking nativo; imágenes bajo el pliegue con `loading="lazy"`; sin Bootstrap/AOS/Font Awesome completos cargados por CDN (se reemplazaron por dependencias específicas y más livianas).
 
-**Constraints**: Cero dependencias de build (Constitución, Principio I); debe seguir siendo editable directamente en los 3 archivos fuente (`index.html`, `style.css`, `script.js`) sin herramientas adicionales.
+**Constraints**: Sin backend/base de datos (Constitución, Principio I y III); sin React Router (no hay nada que rutear, todo es scroll a anclas `#id`); el CSS bespoke se conserva en `legacy.css` en vez de reescribirse a utilities de Tailwind sin necesidad funcional.
 
 **Scale/Scope**: Sitio de un solo negocio local (una profesional, un número de WhatsApp), tráfico bajo/medio, sin necesidad de escalar horizontalmente.
 
 ## Constitution Check
 
-*Ver [.specify/memory/constitution.md](../../.specify/memory/constitution.md)*
+*Ver [.specify/memory/constitution.md](../../.specify/memory/constitution.md) (v2.0.0)*
 
 | Principio | Estado actual | Nota |
 |---|---|---|
-| I. Sitio estático sin build | ✅ Cumple | 3 archivos fuente, sin bundler |
-| II. Mobile-first responsive | ✅ Cumple | Breakpoints en `style.css`, navbar colapsable |
-| III. WhatsApp como canal primario | ✅ Cumple | Issue #2 resuelto: un solo handler de formulario |
-| IV. SEO local y accesibilidad | ✅ Cumple | Issues #3 y #4 resueltos: dominio unificado (`domicilio-vet-valpo.vercel.app`) y sitemap sincronizado |
-| V. Identidad visual consistente | ✅ Cumple | Tokens en `:root` de `style.css`, íconos de marca `#FF3737` |
+| I. Frontend con build, sin backend | ✅ Cumple | React+Vite+Tailwind+shadcn; sin backend/DB introducidos |
+| II. Mobile-first responsive | ✅ Cumple | Utilities responsive de Tailwind + breakpoints heredados en `legacy.css` |
+| III. WhatsApp como canal primario | ✅ Cumple | Los 10 enlaces se generan uniformemente vía `buildWhatsappLink()` (antes 2 de 10 tenían codificación UTF-8 inconsistente) |
+| IV. SEO local y accesibilidad | ✅ Cumple | Meta tags/JSON-LD conservados en el `index.html` raíz (entry de Vite) |
+| V. Identidad visual consistente | ✅ Cumple | Tokens de marca en `legacy.css` + variables HSL de shadcn mapeadas a la misma paleta |
 
 ## Project Structure
 
@@ -50,33 +50,37 @@ Sitio de una página (SPA por anclas), 100% estático, sin backend ni base de da
 specs/001-sitio-web-domicilio-vet-valpo/
 ├── spec.md     # Especificación funcional completa (secciones, objetivos, issues)
 ├── plan.md     # Este archivo
-└── tasks.md    # Backlog de mejoras derivado de los issues del spec
+└── tasks.md    # Backlog de mejoras + fases completadas
 ```
 
 ### Código fuente (raíz del repositorio)
 
 ```text
 domicilio-vet-valpo/
-├── index.html                  # Único documento HTML — todas las secciones (SPA por anclas)
-├── style.css                   # Estilos + design tokens (CSS custom properties en :root)
-├── script.js                   # Interacciones: AOS init, navbar scroll, back-to-top, formulario de contacto
-├── robots.txt                  # Directivas de indexación + referencia a sitemap.xml
-├── sitemap.xml                 # Sitemap SEO (desincronizado, ver Issue #4)
-├── vercel.json                 # Config de build estático para Vercel (@vercel/static)
-├── .replit / .replit.backup    # Config de workflow y puertos para Replit (dev/preview)
-├── replit.md                   # Bitácora histórica del Replit Agent (desactualizada, ver Issue #6)
-├── instagram_fetcher.py        # Script Python (instaloader) que descarga posts de Instagram a JSON — no conectado a la UI
-├── instagram_posts.json        # Salida de instagram_fetcher.py — no consumida por script.js/index.html
-├── assets/                     # Imágenes: hero, carrusel, servicios, operativos, íconos de marca (#FF3737), fotos WhatsApp sin optimizar
-└── .specify/, specs/           # Documentación Spec-Driven Development (este mismo sistema)
+├── index.html                   # Entry mínimo de Vite (meta tags/JSON-LD conservados)
+├── src/
+│   ├── main.tsx / App.tsx
+│   ├── index.css                # @import legacy.css + capas de Tailwind + variables shadcn
+│   ├── styles/legacy.css        # CSS bespoke heredado del sitio estático (casi intacto)
+│   ├── lib/{whatsapp,utils}.ts
+│   ├── hooks/{use-in-view,use-scroll-state}.ts
+│   ├── data/{services,operativos,hero-carousel}.ts
+│   └── components/{ui/, Navbar, FloatingButtons, Hero, HeroCarousel, Services,
+│       ServiceCard, Operativos, OperativoCard, About, InstagramFeed, Contact,
+│       ContactForm, Footer}.tsx
+├── public/                      # assets/, instagram_posts.json, robots.txt, sitemap.xml (servidos tal cual)
+├── e2e/smoke.spec.ts
+├── vite.config.ts / tailwind.config.ts / postcss.config.js / tsconfig*.json / playwright.config.ts / components.json
+├── vercel.json                  # Build moderno (autodetect Vite), output dist/
+├── .replit                      # Workflow → npm install && npm run dev
+├── instagram_fetcher.py         # Sin cambios, standalone (no forma parte del build)
+└── .specify/, specs/            # Documentación Spec-Driven Development (este mismo sistema)
 ```
 
-**Structure Decision**: Se mantiene la estructura plana existente (sin `src/`, sin monorepo) porque el Principio I de la Constitución prohíbe introducir build tooling o reestructuraciones que compliquen la edición directa. La documentación Spec-Driven Development se agrega como capas nuevas (`.specify/`, `specs/`) sin tocar los archivos fuente del sitio.
+**Structure Decision**: Estructura estándar de un proyecto Vite+React (`src/`, `public/`), adoptada a pedido explícito del dueño del negocio pese a que contradice el Principio I original (v1.0.0) de la Constitución — ver el registro de excepción en `constitution.md` v2.0.0. `public/` reemplaza la carpeta `assets/` de la raíz para que Vite la sirva tal cual sin reescribir cada referencia de imagen a un import ESM.
 
 ## Complexity Tracking
 
-*Sin violaciones que requieran justificación — no se introdujo ningún framework, backend ni build step nuevo.*
-
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
-| — | — | — |
+| Introducir build step (Vite) + framework (React) + librería de estilos (Tailwind) + sistema de componentes (shadcn/ui) | Pedido explícito del dueño del negocio, confirmado tras advertirle la contradicción con el Principio I original | Mantener el sitio estático (recomendado por el agente) fue rechazado explícitamente por el usuario a favor de tooling moderno de componentes |

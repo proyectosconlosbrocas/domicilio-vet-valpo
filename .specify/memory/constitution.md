@@ -2,29 +2,33 @@
 
 ## Core Principles
 
-### I. Sitio Estático, Sin Build
-El sitio es HTML5 + CSS3 + JavaScript vanilla puro, sin framework de componentes ni paso de build. Cualquier cambio debe seguir siendo editable abriendo directamente `index.html`, `style.css` y `script.js`. Las librerías externas (Bootstrap, AOS, Bootstrap Icons, Font Awesome) se cargan por CDN, nunca se agregan a un bundler. Justificación: minimiza el hosting, evita dependencias de compilación y permite que personas no técnicas mantengan el sitio.
+### I. Frontend con Build, Sin Backend
+El sitio es una SPA de una sola página construida con **React + TypeScript + Vite**, con **Tailwind CSS** y primitivos de **shadcn/ui** para UI nueva. Sigue sin haber backend, base de datos, ni rutas de servidor — es contenido de marketing estático compilado a `dist/` y servido como archivos estáticos (Vercel). Cualquier lógica bespoke ya afinada (gradientes, animaciones, hover states) vive en `src/styles/legacy.css`, importado una sola vez en `src/index.css`, en vez de reescribirse a utilities de Tailwind sin necesidad funcional real. Justificación del cambio (v1→v2): se adoptó tooling moderno de componentes/estilos a pedido explícito, priorizando DX y mantenibilidad de un component tree sobre la simplicidad de "abrir y editar un HTML" — ver Governance para el registro de esta excepción.
 
 ### II. Mobile-First y Responsive
-Todo componente nuevo debe probarse primero en viewport móvil (menú colapsable, carrusel con `object-fit`, tarjetas apilables). Los breakpoints existentes en `style.css` (sección `/* Responsive */`) son la referencia; no se agregan media queries redundantes cuando ya existe una regla aplicable.
+Todo componente nuevo debe probarse primero en viewport móvil (menú colapsable, carrusel con `object-fit`, tarjetas apilables). El layout usa utilities responsive de Tailwind (`sm:`/`md:`/`lg:`); los breakpoints bespoke que siguen en `legacy.css` (`@media max-width: 992px/768px/576px`) son la referencia para ese código heredado — no se agregan reglas redundantes cuando ya existe una aplicable en cualquiera de los dos sistemas.
 
 ### III. WhatsApp Como Canal de Conversión Primario (NON-NEGOTIABLE)
-Cada llamado a la acción de negocio (agendar consulta, cirugía, tratamiento homeopático, operativos, formulario de contacto) DEBE resolver en un enlace `https://wa.me/56965222368` con mensaje pre-rellenado y contextual al servicio consultado. No se introduce backend de reservas, pagos ni CRM sin que el usuario lo pida explícitamente: el negocio opera hoy 100% vía WhatsApp.
+Cada llamado a la acción de negocio (agendar consulta, cirugía, tratamiento homeopático, operativos, formulario de contacto) DEBE resolver en un enlace `https://wa.me/56965222368` con mensaje pre-rellenado y contextual al servicio consultado, generado uniformemente por `buildWhatsappLink()`/`buildWhatsappMessage()` en `src/lib/whatsapp.ts` — no se hardcodean URLs `wa.me` sueltas en componentes. No se introduce backend de reservas, pagos ni CRM sin que el usuario lo pida explícitamente: el negocio opera hoy 100% vía WhatsApp.
 
 ### IV. SEO Local y Accesibilidad
-Toda sección pública debe mantener: meta description/keywords, Open Graph, Twitter Card, geo tags y el bloque `application/ld+json` de tipo `VeterinaryClinic` sincronizados con el contenido real de la página. Los elementos interactivos requieren `aria-label` o texto accesible equivalente, y el contraste de color sigue la paleta ya validada en `:root` de `style.css`.
+Toda sección pública debe mantener: meta description/keywords, Open Graph, Twitter Card, geo tags y el bloque `application/ld+json` de tipo `VeterinaryClinic` sincronizados con el contenido real de la página. Como es una sola página sin rutas, estos metadatos viven estáticos en el `index.html` raíz (entry de Vite) — no se introduce react-helmet ni gestión dinámica de `<head>` sin una razón real (múltiples rutas/páginas). Los elementos interactivos requieren `aria-label` o texto accesible equivalente.
 
 ### V. Identidad Visual Consistente
-El color de marca `#FF3737` (variable `--primary-color`) y el set de íconos veterinarios generados a medida (`assets/icon-*.png`) son la única fuente de iconografía de marca; no se mezclan con íconos de stock de otro estilo. Los tokens de diseño (color, sombra, radio de borde, transición, tipografía) viven como CSS custom properties en `:root` — no se hardcodean valores nuevos que dupliquen un token existente. Tipografía: `Plus Jakarta Sans` (`--font-heading`) para títulos/CTAs y `Inter` (`--font-body`) para texto de cuerpo, cargadas desde Google Fonts — no se usa system-font como sustituto salvo fallback. Los íconos de marca dentro de una tarjeta/badge circular (`.service-icon`, `.expertise-icon`, `.operativo-icon`) siguen el mismo patrón: fondo `--bg-lighter` en reposo, `--primary-color` con el ícono invertido a blanco en hover.
+El color de marca `#FF3737` y el set de íconos veterinarios generados a medida (`public/assets/icon-*.png`) son la única fuente de iconografía de marca; no se mezclan con íconos de stock de otro estilo para elementos de marca (sí se usa `lucide-react`/`react-icons` para iconografía de UI genérica: flechas, check, mapa, reloj). Los tokens de diseño (color, sombra, radio de borde, transición, tipografía) viven como CSS custom properties en `:root` de `legacy.css` — no se hardcodean valores nuevos que dupliquen un token existente. Los primitivos de shadcn/ui (`Button`, `Input`, etc.) se re-temáticos vía las variables HSL de `src/index.css` (`--primary`, `--radius`, etc.), mapeadas a esos mismos tokens de marca, no a la paleta neutra por defecto de shadcn. Tipografía: `Plus Jakarta Sans` para títulos/CTAs y `Inter` para texto de cuerpo, cargadas desde Google Fonts.
 
 ## Stack Tecnológico
 
-- HTML5 semántico, un único `index.html` (Single Page Application por anclas `#id`).
-- Bootstrap 5.3.3 (grid, navbar, carrusel, formularios) vía `cdn.jsdelivr.net`.
-- Bootstrap Icons 1.11.1 y Font Awesome 4.7.0 (iconografía UI y redes sociales).
-- AOS 2.3.1 (`Animate On Scroll`) para animaciones de entrada, configurado con `once: true`.
-- `script.js` vanilla: sin dependencias de npm, sin transpilación.
-- Hosting de desarrollo: Replit (`.replit`, `python -m http.server 5000` o `static-web-server`). Candidato de producción: Vercel (`vercel.json`, build estático `@vercel/static`).
+- **React 18 + TypeScript + Vite 6**, sin React Router (una sola página, navegación por anclas `#id`).
+- **Tailwind CSS 3** + `tailwindcss-animate`, para layout nuevo y primitivos de shadcn/ui.
+- **shadcn/ui** (`Button`, `Input`, `Textarea`, `Label`, `Card`) — componentes copiados a `src/components/ui/`, no una dependencia npm.
+- **embla-carousel-react** + `embla-carousel-autoplay` para el carrusel del hero (reemplaza el carrusel imperativo de Bootstrap).
+- **lucide-react** (iconografía UI genérica) + **react-icons/fa** (solo `FaWhatsapp`/`FaInstagram`, glifos de marca).
+- `src/styles/legacy.css`: CSS bespoke heredado del sitio estático (gradientes, keyframes, pseudo-elementos, patrón ícono-en-badge), importado en `src/index.css` antes de las utilities de Tailwind.
+- Un hook propio `useInView` (IntersectionObserver nativo) reemplaza a AOS; `useScrollState` centraliza el listener de scroll (navbar + back-to-top).
+- Testing: `@playwright/test` para un smoke test E2E (`e2e/smoke.spec.ts`) — carga de página, hrefs de WhatsApp, envío del formulario, menú móvil.
+- Hosting de desarrollo: Replit (`.replit`, `npm run dev`, puerto 5000, `--host 0.0.0.0`). Producción: **Vercel** (`vercel.json`, `npm run build` → `dist/`, framework `vite`), dominio `domicilio-vet-valpo.vercel.app`.
+- MCPs de proyecto (`.mcp.json`): Playwright, GitHub, Context7, Chrome DevTools, Vercel.
 
 ## Desarrollo y Documentación
 
@@ -32,6 +36,8 @@ Todo cambio de alcance (nueva sección, nuevo servicio, nueva integración) se d
 
 ## Governance
 
-Esta constitución prevalece sobre preferencias de estilo individuales. Cualquier excepción (por ejemplo, introducir un framework, un backend, o abandonar WhatsApp como canal primario) debe justificarse en la sección "Complexity Tracking" del `plan.md` correspondiente y ser aprobada explícitamente por el dueño del negocio antes de implementarse.
+Esta constitución prevalece sobre preferencias de estilo individuales. Cualquier excepción debe justificarse en la sección "Complexity Tracking" del `plan.md` correspondiente y ser aprobada explícitamente por el dueño del negocio antes de implementarse.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-26
+**Registro de excepción (v2.0.0)**: el Principio I original ("Sitio Estático, Sin Build") fue reemplazado a pedido explícito del dueño del negocio el 2026-08-26, confirmado luego de advertirle la contradicción con la versión 1.0.0 de esta constitución. No hubo cambio de producto — WhatsApp sigue siendo el único canal de conversión (Principio III intacto) y no se introdujo backend/base de datos.
+
+**Version**: 2.0.0 | **Ratified**: 2026-08-26 | **Last Amended**: 2026-08-26
