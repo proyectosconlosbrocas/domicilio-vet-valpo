@@ -16,7 +16,9 @@ export function OperativoCard({ operativo, delay = 0 }: { operativo: Operativo; 
         </div>
         <div className="operativo-content">
           <h3 className="operativo-title">
-            <img src={operativo.icon} alt={operativo.iconAlt} className="operativo-icon" />
+            <span className="operativo-icon-badge">
+              <img src={operativo.icon} alt={operativo.iconAlt} className="operativo-icon" />
+            </span>
             {operativo.title}
           </h3>
           <div className="operativo-location">

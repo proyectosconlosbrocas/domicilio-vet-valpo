@@ -14,7 +14,9 @@ export function ServiceCard({ service, delay = 0 }: { service: Service; delay?: 
         </div>
         <div className="service-card-body">
           <div className="service-icon-header">
-            <img src={service.icon} alt={service.iconAlt} className="service-icon" />
+            <span className="service-icon-badge">
+              <img src={service.icon} alt={service.iconAlt} className="service-icon" />
+            </span>
             <h3 className="service-card-title">{service.title}</h3>
           </div>
           <p className="service-card-text">{service.description}</p>

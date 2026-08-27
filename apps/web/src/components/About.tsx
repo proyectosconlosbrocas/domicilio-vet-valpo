@@ -42,7 +42,9 @@ export function About() {
             <div className="expertise-list">
               {EXPERTISE.map((item) => (
                 <div className="expertise-item" key={item.label}>
-                  <img src={item.icon} alt={item.alt} className="expertise-icon" />
+                  <span className="expertise-icon-badge">
+                    <img src={item.icon} alt={item.alt} className="expertise-icon" />
+                  </span>
                   <span>{item.label}</span>
                 </div>
               ))}

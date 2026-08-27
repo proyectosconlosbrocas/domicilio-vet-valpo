@@ -532,10 +532,12 @@ h1, h2, h3, h4, h5, h6,
   transform: translateX(5px);
 }
 
-.expertise-icon {
+.expertise-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
-  object-fit: contain;
   padding: 9px;
   background: var(--bg-lighter);
   border-radius: 50%;
@@ -544,10 +546,20 @@ h1, h2, h3, h4, h5, h6,
   transition: var(--transition);
 }
 
-.expertise-item:hover .expertise-icon {
+.expertise-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: var(--transition);
+}
+
+.expertise-item:hover .expertise-icon-badge {
   background: var(--primary-color);
-  filter: brightness(0) invert(1);
   transform: scale(1.08) rotate(-4deg);
+}
+
+.expertise-item:hover .expertise-icon {
+  filter: brightness(0) invert(1);
 }
 
 /* Sección de Servicios */
@@ -641,20 +653,37 @@ h1, h2, h3, h4, h5, h6,
   margin-bottom: 1rem;
 }
 
-.service-icon {
+/* El círculo de fondo (badge) y el ícono van en elementos separados: si
+   background-color y filter viven en el MISMO elemento, el filter invierte
+   también el fondo (no solo el ícono), y el círculo rojo se vuelve blanco
+   sobre blanco = invisible en hover. */
+.service-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 44px;
   height: 44px;
-  object-fit: contain;
   padding: 9px;
   background: var(--bg-lighter);
   border-radius: 50%;
   box-sizing: border-box;
+  flex-shrink: 0;
   transition: var(--transition);
 }
 
-.service-card:hover .service-icon {
+.service-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: var(--transition);
+}
+
+.service-card:hover .service-icon-badge {
   transform: scale(1.08) rotate(-4deg);
   background: var(--primary-color);
+}
+
+.service-card:hover .service-icon {
   filter: brightness(0) invert(1);
 }
 
@@ -1281,7 +1310,7 @@ h1, h2, h3, h4, h5, h6,
     margin-bottom: 0.75rem;
   }
 
-  .service-icon {
+  .service-icon-badge {
     width: 36px;
     height: 36px;
     padding: 7px;
@@ -1337,7 +1366,7 @@ h1, h2, h3, h4, h5, h6,
     padding: 0.4rem;
   }
 
-  .expertise-icon {
+  .expertise-icon-badge {
     width: 24px;
     height: 24px;
   }
@@ -1478,21 +1507,34 @@ h1, h2, h3, h4, h5, h6,
   gap: 0.75rem;
 }
 
-.operativo-icon {
+.operativo-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 38px;
   height: 38px;
-  object-fit: contain;
   padding: 8px;
   background: var(--bg-lighter);
   border-radius: 50%;
   box-sizing: border-box;
+  flex-shrink: 0;
   transition: var(--transition);
 }
 
-.operativo-card:hover .operativo-icon {
+.operativo-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: var(--transition);
+}
+
+.operativo-card:hover .operativo-icon-badge {
   background: var(--primary-color);
-  filter: brightness(0) invert(1);
   transform: scale(1.08) rotate(-4deg);
+}
+
+.operativo-card:hover .operativo-icon {
+  filter: brightness(0) invert(1);
 }
 
 .operativo-location {
