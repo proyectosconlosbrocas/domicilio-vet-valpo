@@ -25,7 +25,7 @@ export function Hero() {
             ref={left.ref}
             className={`hero-content-left reveal ${left.isVisible ? "is-visible" : ""}`}
           >
-            <img src="/assets/hero-logo.png" alt="Logo" className="hero-logo mb-4" />
+            <img src="/assets/hero-logo.png" alt="" aria-hidden="true" className="hero-logo" />
             <span className="hero-eyebrow">
               <MapPin size={16} /> Valparaíso y Viña del Mar
             </span>
