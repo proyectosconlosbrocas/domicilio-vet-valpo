@@ -176,6 +176,13 @@ Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la inst
 
 **Checkpoint**: APK debug regenerado (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`) sin login, con Home de 3 botones. Listo para que la Dra. Claudia lo pruebe en su celular.
 
+## Fase 14: Ícono APK más grande + logo hero como marca de agua (P3) — 2026-08-27
+
+- [x] T059 El ícono de la app mobile se veía chico y muy centrado dentro del cuadro del launcher. Se regenera con el logo ocupando mucho más espacio: adaptive icon foreground de 55% a 92% del canvas, ícono legacy combinado de 65% a 97%. Regenerado con `@capacitor/assets`, APK recompilado.
+- [x] T060 Web: el logo del hero (`/assets/hero-logo.png`) pasa de ser un avatar circular chico arriba del texto a una marca de agua grande y transparente **detrás** de todo el contenido del hero (`position: absolute`, `z-index: -1` dentro de `.hero-content-left`, `opacity: 0.14`, tamaño con `clamp()` hasta 520px). Se limpian los overrides responsive viejos que ajustaban tamaño/margen del logo en flujo normal, ya obsoletos al sacarlo del flujo. `alt=""` + `aria-hidden="true"` en el `<img>` por ser decorativo. Verificado con Playwright en desktop y mobile, local y producción.
+
+**Checkpoint**: desplegado a producción (`https://domicilio-vet-valpo.vercel.app/`), verificado en vivo con Playwright.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
