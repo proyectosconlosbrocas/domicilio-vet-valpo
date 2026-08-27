@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
@@ -10,10 +10,16 @@ type Cliente = Tables<"clientes">;
 
 export function ScheduleVisitScreen() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  // Si se llega desde el calendario tocando un día puntual, la fecha viene
+  // fija en la URL y no se puede cambiar acá — solo elegir cliente y hora.
+  const fechaFija = searchParams.get("fecha");
+
   const [clientes, setClientes] = useState<Cliente[] | null>(null);
   const [query, setQuery] = useState("");
   const [seleccionado, setSeleccionado] = useState<Cliente | null>(null);
-  const [fecha, setFecha] = useState("");
+  const [fecha, setFecha] = useState(fechaFija ?? "");
+  const [hora, setHora] = useState("");
   const [notas, setNotas] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,6 +61,7 @@ export function ScheduleVisitScreen() {
     const { error: insertError } = await supabase.from("agenda_visitas").insert({
       cliente_id: seleccionado.id,
       fecha,
+      hora: hora || null,
       notas: notas || null,
       created_by: user?.id,
     });
@@ -139,8 +146,24 @@ export function ScheduleVisitScreen() {
               id="fecha"
               type="date"
               required
+              readOnly={Boolean(fechaFija)}
               value={fecha}
               onChange={(e) => setFecha(e.target.value)}
+              className={`w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+                fechaFija ? "bg-neutral-100 text-neutral-500" : ""
+              }`}
+            />
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-1 block text-sm font-medium text-neutral-700" htmlFor="hora">
+              Hora (opcional)
+            </label>
+            <input
+              id="hora"
+              type="time"
+              value={hora}
+              onChange={(e) => setHora(e.target.value)}
               className="w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>

@@ -130,6 +130,7 @@ export interface Database {
           id: string;
           cliente_id: string;
           fecha: string;
+          hora: string | null;
           notas: string | null;
           created_by: string | null;
           created_at: string;
@@ -138,6 +139,7 @@ export interface Database {
           id?: string;
           cliente_id: string;
           fecha: string;
+          hora?: string | null;
           notas?: string | null;
           created_by?: string | null;
           created_at?: string;

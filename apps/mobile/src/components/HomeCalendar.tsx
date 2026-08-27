@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Link } from "react-router-dom";
+import { ChevronLeft, ChevronRight, CalendarPlus, Pencil, Check } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 const CHILE_TZ = "America/Santiago";
@@ -30,7 +31,9 @@ function dateStr(year: number, month: number, day: number) {
 }
 
 interface AgendaCliente {
+  id: string;
   fecha: string;
+  hora: string | null;
   cliente_id: string;
   clientes: { nombre: string } | null;
 }
@@ -41,6 +44,8 @@ export function HomeCalendar() {
   const [viewMonth, setViewMonth] = useState(today.month);
   const [agenda, setAgenda] = useState<AgendaCliente[]>([]);
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingHora, setEditingHora] = useState("");
 
   useEffect(() => {
     const firstDay = dateStr(viewYear, viewMonth, 1);
@@ -51,9 +56,10 @@ export function HomeCalendar() {
     setSelectedDay(null);
     supabase
       .from("agenda_visitas")
-      .select("fecha, cliente_id, clientes(nombre)")
+      .select("id, fecha, hora, cliente_id, clientes(nombre)")
       .gte("fecha", firstDay)
       .lte("fecha", lastDay)
+      .order("hora", { nullsFirst: false })
       .then(({ data }) => {
         if (!cancelled) setAgenda((data as unknown as AgendaCliente[]) ?? []);
       });
@@ -94,9 +100,24 @@ export function HomeCalendar() {
     }
     setViewMonth(m);
     setViewYear(y);
+    setEditingId(null);
+  }
+
+  function selectDay(day: number) {
+    setSelectedDay((prev) => (prev === day ? null : day));
+    setEditingId(null);
+  }
+
+  async function guardarHora(item: AgendaCliente) {
+    const { error } = await supabase.from("agenda_visitas").update({ hora: editingHora || null }).eq("id", item.id);
+    if (!error) {
+      setAgenda((prev) => prev.map((a) => (a.id === item.id ? { ...a, hora: editingHora || null } : a)));
+    }
+    setEditingId(null);
   }
 
   const seleccionados = selectedDay ? (agendaPorDia.get(selectedDay) ?? []) : [];
+  const fechaSeleccionada = selectedDay ? dateStr(viewYear, viewMonth, selectedDay) : null;
 
   return (
     <div className="mx-4 mb-4 rounded-2xl bg-white p-4 shadow-sm">
@@ -130,7 +151,7 @@ export function HomeCalendar() {
             <button
               key={day}
               type="button"
-              onClick={() => setSelectedDay(hasAgenda ? day : null)}
+              onClick={() => selectDay(day)}
               className={[
                 "aspect-square rounded-lg text-sm transition",
                 hasAgenda
@@ -146,22 +167,62 @@ export function HomeCalendar() {
         })}
       </div>
 
-      {selectedDay && (
+      {selectedDay && fechaSeleccionada && (
         <div className="mt-3 border-t border-neutral-100 pt-3">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-400">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-400">
             Agendados el {selectedDay} de {MONTH_LABELS[viewMonth].toLowerCase()}
           </p>
+
           {seleccionados.length === 0 ? (
-            <p className="text-sm text-neutral-500">Sin citas.</p>
+            <p className="mb-3 text-sm text-neutral-500">Sin citas.</p>
           ) : (
-            <ul className="space-y-1">
+            <ul className="mb-3 space-y-2">
               {seleccionados.map((item) => (
-                <li key={item.cliente_id} className="text-sm text-neutral-700">
-                  • {item.clientes?.nombre ?? "Cliente"}
+                <li key={item.id} className="flex items-center justify-between gap-2 text-sm text-neutral-700">
+                  <span className="min-w-0 truncate">{item.clientes?.nombre ?? "Cliente"}</span>
+
+                  {editingId === item.id ? (
+                    <div className="flex shrink-0 items-center gap-1">
+                      <input
+                        type="time"
+                        autoFocus
+                        value={editingHora}
+                        onChange={(e) => setEditingHora(e.target.value)}
+                        className="rounded-md border border-neutral-300 px-1.5 py-0.5 text-xs"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => guardarHora(item)}
+                        aria-label="Guardar hora"
+                        className="text-primary"
+                      >
+                        <Check size={16} />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEditingId(item.id);
+                        setEditingHora(item.hora ?? "");
+                      }}
+                      className="flex shrink-0 items-center gap-1 text-xs font-medium text-neutral-500"
+                    >
+                      {item.hora ? item.hora.slice(0, 5) : "Sin hora"}
+                      <Pencil size={12} />
+                    </button>
+                  )}
                 </li>
               ))}
             </ul>
           )}
+
+          <Link
+            to={`/agendar-visita?fecha=${fechaSeleccionada}`}
+            className="flex items-center justify-center gap-2 rounded-lg bg-primary/10 py-2 text-sm font-semibold text-primary"
+          >
+            <CalendarPlus size={16} /> Agendar visita este día
+          </Link>
         </div>
       )}
     </div>
