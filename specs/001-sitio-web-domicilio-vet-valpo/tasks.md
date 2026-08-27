@@ -166,6 +166,16 @@ No pude hacer esto por API — la configuración de URLs de Auth se administra d
 
 **Checkpoint**: APK debug generado y funcional con ícono real y login por código, cuenta de staff real con el email correcto. Falta build **release firmado** para distribución final (el debug ya sirve para que la Dra. Claudia empiece a probar).
 
+## Fase 13: Sin pantalla de login + Home con 3 accesos (P1) — 2026-08-27
+
+Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la instala a mano una sola persona). No debe existir ninguna barrera de email/código al abrir.
+
+- [x] T056 Se saca `LoginScreen` y se reemplaza por auto-login silencioso: la app se autentica sola al iniciar con una credencial de staff fija (`VITE_STAFF_EMAIL`/`VITE_STAFF_PASSWORD`, en `apps/mobile/.env.local`, gitignored). Se setea password a la cuenta de staff real vía Admin API. **Trade-off aceptado explícitamente por el usuario** (ver pregunta hecha y respondida en la sesión): esa credencial queda embebida en el bundle compilado del APK y es técnicamente extraíble por cualquiera que abra el `.apk` como zip — la protección real de los datos sigue siendo RLS (`is_staff()`) en Supabase, no la app. Si esta app llegara a distribuirse más ampliamente en el futuro, hay que volver a un login real por persona (email + código, como en la Fase 12, o similar).
+- [x] T057 Nueva `HomeScreen` con los 3 accesos pedidos, sin nada más: **Agregar cliente** (`/clientes/nuevo`), **Ver clientes** (`/clientes`, toca un cliente → ficha de solo lectura), **Editar clientes** (`/clientes/editar`, toca un cliente → va directo al formulario de edición). `ClientListScreen` ahora recibe `mode: "ver" | "editar"` para decidir el destino al tocar un cliente; se sacan el botón "+" flotante y el botón de logout (ya no aplican).
+- [x] T058 Verificado con Playwright contra la base real: la app abre directo en el Home sin ninguna pantalla de login, y los 3 botones navegan correctamente a sus destinos.
+
+**Checkpoint**: APK debug regenerado (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`) sin login, con Home de 3 botones. Listo para que la Dra. Claudia lo pruebe en su celular.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
