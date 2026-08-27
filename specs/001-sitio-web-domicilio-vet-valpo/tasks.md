@@ -199,6 +199,16 @@ Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la inst
 
 **Checkpoint**: desplegado a producción (`https://domicilio-vet-valpo.vercel.app/`), verificado en vivo con Playwright.
 
+## Fase 17: Portal de clientes integrado al sitio + login con contraseña (P1) — 2026-08-27
+
+- [x] T067 `/portal` y `/completar-perfil` dejan de ser páginas aisladas sin cabecera/pie — ahora renderizan el mismo `Navbar`/`Footer` que el resto del sitio. Copy ajustado para no hablar de "portal" (ej. "Tu portal de Domicilio Vet Valpo" → "Tus mascotas en Domicilio Vet Valpo").
+- [x] T068 Se saca el magic link (`signInWithOtp`) del login. `PortalLoginForm` ahora es email + contraseña real (`signInWithPassword`), con un toggle a "Crear cuenta" (`signUp`) para clientes nuevos — mismo flujo de siempre (crear cuenta → completar perfil → dashboard), solo que ya no depende de abrir un correo.
+- [x] T069 Verificado: build limpio, UI de login/signup con Playwright (local y producción, con navbar/footer visibles y campo de contraseña presente), manejo de error "Correo o contraseña incorrectos." probado.
+
+**Hallazgo, no bloqueante**: el proyecto de Supabase tiene "Confirm email" activo — `signUp` sin ese flag desactivado igual manda un correo de confirmación (no se puede evitar desde el código, es config de **Authentication → Sign In / Providers → Email** en el dashboard). Mientras tanto la UI lo maneja bien (pantalla "Confirmá tu correo" en vez de romperse). Además, el envío de esos correos comparte el mismo límite por hora ya señalado en la Fase 12 — para clientes reales sin cortes, conviene el SMTP propio (Resend/Postmark) recomendado desde la Fase 10.
+
+**Checkpoint**: desplegado a producción, verificado en vivo.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
