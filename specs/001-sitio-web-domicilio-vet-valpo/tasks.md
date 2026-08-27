@@ -218,6 +218,15 @@ Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la inst
 
 **Checkpoint**: APK debug regenerado (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`).
 
+## Fase 19: Ubicación de cliente con Google Maps (P1) — 2026-08-27
+
+- [x] T074 `@capacitor/geolocation` (7.1.8, compatible con `@capacitor/core` ^7) + permisos `ACCESS_FINE_LOCATION`/`ACCESS_COARSE_LOCATION` en `AndroidManifest.xml`. Migración 0006: `clientes` gana `direccion_lat`/`direccion_lng` (opcionales, independientes del campo `direccion` de texto libre).
+- [x] T075 `ClientFormScreen`: botón **"Registrar dirección con Google Maps"** — captura la ubicación GPS exacta del celular en ese momento (`Geolocation.getCurrentPosition`) y la guarda con el resto del cliente (alta y edición).
+- [x] T076 `ClientDetailScreen`: si el cliente tiene ubicación guardada, botón **"Ver en Google Maps"** que abre `https://www.google.com/maps?q=lat,lng` en la app de Maps o el navegador del sistema.
+- [x] T077 Verificado end-to-end con Playwright (permiso de geolocalización mockeado) contra la base real: se captura y guarda la ubicación al crear un cliente, el link de Maps en la ficha tiene el href correcto. Cliente de prueba limpiado.
+
+**Checkpoint**: APK debug regenerado con la función de ubicación funcionando contra la base real.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
