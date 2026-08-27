@@ -153,6 +153,17 @@ No pude hacer esto por API — la configuración de URLs de Auth se administra d
 
 **Checkpoint**: desplegado a producción (`https://domicilio-vet-valpo.vercel.app/`), verificado en vivo con Playwright.
 
+## Fase 12: APK de staff, ícono real y login sin password (P1) — 2026-08-27
+
+- [x] T051 Se confirma la arquitectura: `apps/web` es solo landing pública + portal de clientes; toda la vista de la Dra. Claudia vive únicamente en `apps/mobile` (Capacitor). Se genera el primer APK debug (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`, gitignored, no se versiona) para probar en el celular real.
+- [x] T052 Ícono real de la app: se genera `ic_launcher` (todas las densidades + adaptive icon foreground/background) y el splash screen a partir de `/assets/icono.png` (el mismo logo de la navbar web) vía `@capacitor/assets`. Fuente versionada en `apps/mobile/assets/`.
+- [x] T053 Login sin password: se reemplaza `signInWithPassword` por un flujo de dos pasos email → código de un solo uso (`signInWithOtp` + `verifyOtp`, `shouldCreateUser: false` para que solo cuentas de staff ya dadas de alta puedan pedir código). Se crea la cuenta real de staff (`scripts/setup-real-staff.mjs`): `domiciliovetvalpo@gmail.com`, fila en `staff` con rol `admin`. La seguridad de los datos sigue siendo RLS (`is_staff()`) — esto solo saca la fricción de gestionar contraseña para una única usuaria, no abre acceso público a la base.
+- [x] T054 Verificación end-to-end con Playwright contra la base real: pantalla de email → código → `StaffGate` pasa → lista de clientes visible. Código obtenido vía Admin API (`generate_link`) para no depender de leer el inbox real durante la verificación automatizada.
+
+**Pendiente de acción manual del usuario**: confirmar que el correo real que llega a `domiciliovetvalpo@gmail.com` muestra el código numérico (no solo un link para clickear) — el template por defecto de Supabase para "Magic Link" a veces no incluye `{{ .Token }}`. Si el correo real no trae el código, hay que agregarlo manualmente en el dashboard: **Authentication → Email Templates → Magic Link**, agregando `{{ .Token }}` al cuerpo.
+
+**Checkpoint**: APK debug generado y funcional con ícono real y login por código, verificado contra la base real. Falta build **release firmado** para distribución final (el debug ya sirve para que la Dra. Claudia empiece a probar).
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
