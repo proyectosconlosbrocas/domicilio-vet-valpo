@@ -135,7 +135,7 @@ h1, h2, h3, h4, h5, h6,
   background-color: rgba(255, 55, 55, 0.96) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  padding: 1rem 0;
+  padding: 0.65rem 0;
   transition: var(--transition);
 }
 
@@ -144,7 +144,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .navbar.scrolled {
-  padding: 0.6rem 0;
+  padding: 0.45rem 0;
   background-color: var(--primary-color) !important;
   box-shadow: var(--shadow-md);
 }
@@ -152,12 +152,12 @@ h1, h2, h3, h4, h5, h6,
 .navbar-brand-logo {
   display: inline-flex;
   align-items: center;
-  margin-right: 1rem;
+  margin-right: 0.75rem;
 }
 
 .logonav {
-  width: 65px;
-  height: 65px;
+  width: 52px;
+  height: 52px;
   object-fit: contain;
   transition: transform 0.3s ease;
 }
@@ -168,7 +168,7 @@ h1, h2, h3, h4, h5, h6,
 
 .navbar-brand {
   color: white !important;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
@@ -208,6 +208,26 @@ h1, h2, h3, h4, h5, h6,
 .navbar .nav-link:focus {
   outline: 2px solid rgba(255, 255, 255, 0.5);
   outline-offset: 4px;
+}
+
+/* Link "Clientes": va al portal, no a una sección de la página — se
+   distingue del resto como una píldora blanca en vez de texto plano. */
+.navbar .nav-link-cta {
+  background-color: white;
+  color: var(--primary-color) !important;
+  border-radius: var(--border-radius-pill);
+  padding: 0.5rem 1.1rem !important;
+  font-weight: 700;
+}
+
+.navbar .nav-link-cta::after {
+  display: none;
+}
+
+.navbar .nav-link-cta:hover,
+.navbar .nav-link-cta:focus {
+  background-color: var(--bg-light);
+  color: var(--primary-hover) !important;
 }
 
 .navbar-toggler {
@@ -1117,7 +1137,7 @@ h1, h2, h3, h4, h5, h6,
   }
 
   .navbar-brand {
-    font-size: 1.2rem;
+    font-size: 1.05rem;
   }
 
   .hero-carousel {
@@ -1197,8 +1217,8 @@ h1, h2, h3, h4, h5, h6,
   }
 
   .logonav {
-    width: 50px;
-    height: 50px;
+    width: 42px;
+    height: 42px;
   }
 
   .navbar-brand-logo {
@@ -1285,8 +1305,8 @@ h1, h2, h3, h4, h5, h6,
   }
 
   .logonav {
-    width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
   }
 
   .service-card-body {

@@ -58,8 +58,8 @@ export function Navbar() {
             </li>
           ))}
           <li>
-            <Link to="/portal" className="nav-link flex items-center gap-1.5">
-              <UserCircle size={18} /> Portal de Clientes
+            <Link to="/portal" className="nav-link nav-link-cta flex items-center gap-1.5">
+              <UserCircle size={18} /> Clientes
             </Link>
           </li>
         </ul>
@@ -80,8 +80,12 @@ export function Navbar() {
             </li>
           ))}
           <li>
-            <Link to="/portal" className="nav-link flex items-center gap-1.5" onClick={() => setMenuOpen(false)}>
-              <UserCircle size={18} /> Portal de Clientes
+            <Link
+              to="/portal"
+              className="nav-link nav-link-cta flex items-center gap-1.5"
+              onClick={() => setMenuOpen(false)}
+            >
+              <UserCircle size={18} /> Clientes
             </Link>
           </li>
         </ul>
