@@ -183,6 +183,15 @@ Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la inst
 
 **Checkpoint**: desplegado a producción (`https://domicilio-vet-valpo.vercel.app/`), verificado en vivo con Playwright.
 
+## Fase 15: Agendar visita + calendario en Home (P1) — 2026-08-27
+
+- [x] T061 Nueva tabla `agenda_visitas` (migración `0004_agenda_visitas.sql`, aplicada a la base real): `cliente_id` + `fecha` (día, sin mascota ni hora — a diferencia de `visitas`, que es el registro clínico ya realizado y sí requiere una mascota puntual). RLS solo staff, igual patrón que el resto de las tablas internas. Tipos agregados a mano en `database.types.ts`.
+- [x] T062 Home: los 3 botones existentes se achican (grid 2x2) y se agrega un 4to, **Agendar visita**. `ScheduleVisitScreen` nueva: buscar/seleccionar cliente + elegir día + notas opcionales → inserta en `agenda_visitas`.
+- [x] T063 `HomeCalendar`: calendario mensual debajo de los 4 botones. "Hoy" se calcula con la hora de Chile (`Intl.DateTimeFormat` con `timeZone: America/Santiago`), no la del dispositivo — evita bugs de zona horaria sin importar dónde esté físicamente el teléfono. Los días con al menos un cliente agendado se marcan con un cuadro rojo; tocar un día marcado muestra debajo la lista de clientes agendados ese día.
+- [x] T064 Verificado end-to-end con Playwright contra la base real: se agenda una visita para un cliente de prueba, el día de hoy aparece marcado en rojo en el calendario, y tocarlo muestra el cliente correcto. Datos de prueba limpiados al final (cliente + fila de agenda).
+
+**Checkpoint**: APK debug regenerado (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`) con agendamiento y calendario funcionando contra la base real.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
