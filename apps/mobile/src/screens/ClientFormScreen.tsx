@@ -1,5 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { Geolocation } from "@capacitor/geolocation";
+import { MapPin, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
 import { TextField } from "@/components/fields";
@@ -14,6 +16,8 @@ const EMPTY: FormValues = {
   telefono_alternativo: "",
   email: "",
   direccion: "",
+  direccion_lat: null,
+  direccion_lng: null,
   contacto_emergencia_nombre: "",
   contacto_emergencia_telefono: "",
 };
@@ -27,6 +31,8 @@ export function ClientFormScreen() {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!clienteId) return;
@@ -44,6 +50,8 @@ export function ClientFormScreen() {
             telefono_alternativo: data.telefono_alternativo ?? "",
             email: data.email ?? "",
             direccion: data.direccion ?? "",
+            direccion_lat: data.direccion_lat,
+            direccion_lng: data.direccion_lng,
             contacto_emergencia_nombre: data.contacto_emergencia_nombre ?? "",
             contacto_emergencia_telefono: data.contacto_emergencia_telefono ?? "",
           });
@@ -54,6 +62,23 @@ export function ClientFormScreen() {
 
   function handleChange(field: keyof FormValues) {
     return (e: React.ChangeEvent<HTMLInputElement>) => setValues((prev) => ({ ...prev, [field]: e.target.value }));
+  }
+
+  async function handleRegistrarUbicacion() {
+    setLocating(true);
+    setLocationError(null);
+    try {
+      const position = await Geolocation.getCurrentPosition({ enableHighAccuracy: true });
+      setValues((prev) => ({
+        ...prev,
+        direccion_lat: position.coords.latitude,
+        direccion_lng: position.coords.longitude,
+      }));
+    } catch {
+      setLocationError("No se pudo obtener la ubicación. Revisá que el permiso de ubicación esté activo.");
+    } finally {
+      setLocating(false);
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -84,6 +109,8 @@ export function ClientFormScreen() {
     );
   }
 
+  const tieneUbicacion = values.direccion_lat != null && values.direccion_lng != null;
+
   return (
     <div className="min-h-screen bg-neutral-50">
       <AppHeader title={isEdit ? "Editar cliente" : "Nuevo cliente"} back />
@@ -107,6 +134,26 @@ export function ClientFormScreen() {
         />
         <TextField id="email" label="Email" type="email" value={values.email ?? ""} onChange={handleChange("email")} />
         <TextField id="direccion" label="Dirección" value={values.direccion ?? ""} onChange={handleChange("direccion")} />
+
+        <div className="mb-4">
+          <button
+            type="button"
+            onClick={handleRegistrarUbicacion}
+            disabled={locating}
+            className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary py-2.5 text-sm font-semibold text-primary transition disabled:opacity-60"
+          >
+            <MapPin size={16} />
+            {locating ? "Obteniendo ubicación…" : "Registrar dirección con Google Maps"}
+          </button>
+          {tieneUbicacion && (
+            <p className="mt-1.5 flex items-center gap-1 text-xs text-neutral-500">
+              <CheckCircle2 size={14} className="text-primary" />
+              Ubicación capturada ({values.direccion_lat!.toFixed(5)}, {values.direccion_lng!.toFixed(5)})
+            </p>
+          )}
+          {locationError && <p className="mt-1.5 text-xs text-red-600">{locationError}</p>}
+        </div>
+
         <TextField
           id="contacto_emergencia_nombre"
           label="Contacto de emergencia — nombre"

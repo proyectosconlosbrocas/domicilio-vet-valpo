@@ -43,6 +43,8 @@ export interface Database {
           telefono_alternativo: string | null;
           email: string | null;
           direccion: string | null;
+          direccion_lat: number | null;
+          direccion_lng: number | null;
           contacto_emergencia_nombre: string | null;
           contacto_emergencia_telefono: string | null;
           consentimiento_datos_aceptado: boolean;
@@ -60,6 +62,8 @@ export interface Database {
           telefono_alternativo?: string | null;
           email?: string | null;
           direccion?: string | null;
+          direccion_lat?: number | null;
+          direccion_lng?: number | null;
           contacto_emergencia_nombre?: string | null;
           contacto_emergencia_telefono?: string | null;
           consentimiento_datos_aceptado?: boolean;

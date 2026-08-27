@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Pencil, Phone, MapPin, Plus, PawPrint, Mail } from "lucide-react";
+import { Pencil, Phone, MapPin, Plus, PawPrint, Mail, Map } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
 import type { Tables } from "@vetvalpo/supabase";
@@ -76,6 +76,16 @@ export function ClientDetailScreen() {
               <p className="flex items-center gap-2">
                 <MapPin size={16} className="text-primary" /> {cliente.direccion}
               </p>
+            )}
+            {cliente.direccion_lat != null && cliente.direccion_lng != null && (
+              <a
+                href={`https://www.google.com/maps?q=${cliente.direccion_lat},${cliente.direccion_lng}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary"
+              >
+                <Map size={16} /> Ver en Google Maps
+              </a>
             )}
             {cliente.contacto_emergencia_nombre && (
               <p className="text-neutral-500">
