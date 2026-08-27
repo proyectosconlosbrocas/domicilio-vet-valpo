@@ -3,6 +3,8 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useSession } from "@/hooks/useSession";
 import { useCliente } from "@/hooks/useCliente";
 import { supabase } from "@/lib/supabase";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -164,15 +166,21 @@ function CompletarPerfilForm({ authUserId, email }: { authUserId: string; email:
 export function CompletarPerfilPage() {
   const session = useSession();
 
-  if (session === undefined) {
-    return <p className="p-8 text-center text-neutral-500">Cargando…</p>;
-  }
-
-  if (session === null) {
-    return <Navigate to="/portal" replace />;
-  }
-
-  return <CompletarPerfilInner authUserId={session.user.id} email={session.user.email} />;
+  return (
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-neutral-50 px-4 py-10">
+        {session === undefined ? (
+          <p className="p-8 text-center text-neutral-500">Cargando…</p>
+        ) : session === null ? (
+          <Navigate to="/portal" replace />
+        ) : (
+          <CompletarPerfilInner authUserId={session.user.id} email={session.user.email} />
+        )}
+      </main>
+      <Footer />
+    </>
+  );
 }
 
 function CompletarPerfilInner({ authUserId, email }: { authUserId: string; email: string | undefined }) {
@@ -182,14 +190,10 @@ function CompletarPerfilInner({ authUserId, email }: { authUserId: string; email
     return <p className="p-8 text-center text-neutral-500">Cargando…</p>;
   }
 
-  // Self-healing: si ya tiene perfil (ej. volvió a este link por error), directo al portal.
+  // Self-healing: si ya tiene perfil (ej. volvió a esta página por error), directo al portal.
   if (cliente) {
     return <Navigate to="/portal" replace />;
   }
 
-  return (
-    <div className="min-h-screen bg-neutral-50 px-4 py-10">
-      <CompletarPerfilForm authUserId={authUserId} email={email} />
-    </div>
-  );
+  return <CompletarPerfilForm authUserId={authUserId} email={email} />;
 }

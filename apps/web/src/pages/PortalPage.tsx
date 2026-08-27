@@ -5,6 +5,8 @@ import { LogOut, Pencil, Plus } from "lucide-react";
 import { useSession } from "@/hooks/useSession";
 import { useCliente } from "@/hooks/useCliente";
 import { supabase } from "@/lib/supabase";
+import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 import { PortalLoginForm } from "@/components/portal/PortalLoginForm";
 import { MascotaHistoryCard } from "@/components/portal/MascotaHistoryCard";
 import { ContactEditForm } from "@/components/portal/ContactEditForm";
@@ -28,7 +30,7 @@ function PortalDashboard({ session }: { session: Session }) {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="font-heading text-2xl font-bold text-primary">Hola, {cliente.nombre.split(" ")[0]}</h1>
-          <p className="text-sm text-neutral-500">Tu portal de Domicilio Vet Valpo</p>
+          <p className="text-sm text-neutral-500">Tus mascotas en Domicilio Vet Valpo</p>
         </div>
         <button
           onClick={() => supabase.auth.signOut()}
@@ -108,19 +110,21 @@ function PortalDashboard({ session }: { session: Session }) {
 export function PortalPage() {
   const session = useSession();
 
-  if (session === undefined) {
-    return <p className="p-8 text-center text-neutral-500">Cargando…</p>;
-  }
-
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {session === null ? (
-        <div className="flex min-h-screen items-center justify-center px-4">
-          <PortalLoginForm />
-        </div>
-      ) : (
-        <PortalDashboard session={session} />
-      )}
-    </div>
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-neutral-50">
+        {session === undefined ? (
+          <p className="p-8 text-center text-neutral-500">Cargando…</p>
+        ) : session === null ? (
+          <div className="flex min-h-[70vh] items-center justify-center px-4 py-10">
+            <PortalLoginForm />
+          </div>
+        ) : (
+          <PortalDashboard session={session} />
+        )}
+      </main>
+      <Footer />
+    </>
   );
 }
