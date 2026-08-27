@@ -11,3 +11,6 @@ playwright/.cache/
 .env.*
 !.env.example
 supabase/.temp/
+
+# Builds de la app mobile (APK) — no van al repo, se generan localmente
+apps/mobile/builds/
