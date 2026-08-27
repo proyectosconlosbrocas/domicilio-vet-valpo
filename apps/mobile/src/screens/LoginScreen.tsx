@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { supabase } from "@/lib/supabase";
 
-const STAFF_EMAIL = "domiciliovetvalpo@gmail.com";
+const STAFF_EMAIL = "mauro.carcamo89@gmail.com";
 
 export function LoginScreen() {
   const [step, setStep] = useState<"email" | "code">("email");
