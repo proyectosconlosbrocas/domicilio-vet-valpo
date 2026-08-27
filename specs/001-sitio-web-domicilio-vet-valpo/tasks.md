@@ -209,6 +209,15 @@ Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la inst
 
 **Checkpoint**: desplegado a producción, verificado en vivo.
 
+## Fase 18: Agendar y editar hora desde el día del calendario (P1) — 2026-08-27
+
+- [x] T070 Migración 0005: `agenda_visitas` gana columna `hora` (`time`, opcional).
+- [x] T071 Tocar un día del calendario (con o sin citas) abre su panel: qué hay agendado ese día + botón **"Agendar visita este día"** → `ScheduleVisitScreen` con la fecha prellenada y bloqueada (query param `?fecha=`), solo queda elegir cliente y hora.
+- [x] T072 Cada cita agendada muestra su hora (o "Sin hora") y se edita tocándola ahí mismo (input de hora + confirmar) — único campo editable de una cita desde el calendario, no cliente ni fecha.
+- [x] T073 Verificado end-to-end con Playwright contra la base real: agendar desde un día vacío, ver la cita con su hora, editarla y confirmar que persiste. Datos de prueba limpiados.
+
+**Checkpoint**: APK debug regenerado (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`).
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
