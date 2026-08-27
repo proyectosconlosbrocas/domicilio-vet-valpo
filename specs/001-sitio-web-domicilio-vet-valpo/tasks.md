@@ -144,6 +144,15 @@ No pude hacer esto por API — la configuración de URLs de Auth se administra d
 
 **Checkpoint**: MVP completo de las dos mitades (Fase 1 mobile en la Fase 7-9, Fase 1 web acá) verificado de punta a punta contra la base de datos real, con datos de prueba limpiados. Falta el paso manual de Auth URL Configuration arriba antes de que el magic link funcione para clientes reales.
 
+## Fase 11: Fix de iconos badge rotos en hover (P2) — 2026-08-27
+
+- [x] T049 Reporte del usuario: los íconos tipo `.service-icon` (círculo de color con ícono de línea encima) no se veían bien en toda la app. Se identificaron dos bugs distintos:
+  1. **Assets**: los PNG fuente (`icon-cruz-veterinaria`, `icon-estetoscopio`, `icon-jeringa`, `icon-mascotas`, `icon-pata-corazon`, `icon-plato`) tenían fondo blanco sólido en vez de transparencia real, rompiendo el círculo de color detrás del ícono. Corregido extrayendo el canal alpha real (`alpha = 255 - min(r,g,b)`) vía Pillow.
+  2. **CSS**: `filter: brightness(0) invert(1)` se aplicaba al mismo elemento que ya tenía `background-color` (el círculo del badge). Al invertir, el fondo rojo también se invertía a blanco, haciendo desaparecer el badge completo en hover (blanco sobre blanco). Corregido separando cada ícono en un wrapper `<span class="X-icon-badge">` (fondo + transform) y el `<img class="X-icon">` interior (solo `filter` + `object-fit`). Aplicado a `.service-icon` (`ServiceCard.tsx`), `.expertise-icon` (`About.tsx`) y `.operativo-icon` (`OperativoCard.tsx`), incluyendo sus media queries responsive. `.hero-icon` (`Hero.tsx`) no tenía este patrón (sin `background` ni `filter` en hover, solo `transform: scale`) y no requirió cambios.
+- [x] T050 Verificación: build de `apps/web` limpio (`tsc -b && vite build`), y verificación visual con Playwright (local y producción) confirmando que los tres badges pasan de `rgb(255,226,226)` en reposo a `rgb(255,55,55)` en hover sin desaparecer, en `ServiceCard`, `About`/expertise y `OperativoCard`.
+
+**Checkpoint**: desplegado a producción (`https://domicilio-vet-valpo.vercel.app/`), verificado en vivo con Playwright.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
