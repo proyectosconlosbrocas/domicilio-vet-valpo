@@ -1,13 +1,18 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Plus, Search, PawPrint } from "lucide-react";
+import { Search, PawPrint } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
 import type { Tables } from "@vetvalpo/supabase";
 
 type ClienteConMascotas = Tables<"clientes"> & { mascotas: Tables<"mascotas">[] };
 
-export function ClientListScreen() {
+interface ClientListScreenProps {
+  /** "ver": tocar un cliente abre su ficha (solo lectura + accesos). "editar": tocar un cliente va directo al formulario de edición. */
+  mode: "ver" | "editar";
+}
+
+export function ClientListScreen({ mode }: ClientListScreenProps) {
   const [clientes, setClientes] = useState<ClienteConMascotas[] | null>(null);
   const [query, setQuery] = useState("");
 
@@ -40,7 +45,7 @@ export function ClientListScreen() {
 
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">
-      <AppHeader title="Clientes" showLogout />
+      <AppHeader title={mode === "editar" ? "Editar clientes" : "Clientes"} back />
 
       <div className="p-4">
         <div className="relative mb-4">
@@ -65,7 +70,7 @@ export function ClientListScreen() {
             {filtered.map((cliente) => (
               <li key={cliente.id}>
                 <Link
-                  to={`/clientes/${cliente.id}`}
+                  to={mode === "editar" ? `/clientes/${cliente.id}/editar` : `/clientes/${cliente.id}`}
                   className="block rounded-xl bg-white p-4 shadow-sm transition active:scale-[0.99]"
                 >
                   <p className="font-semibold text-neutral-800">{cliente.nombre}</p>
@@ -88,14 +93,6 @@ export function ClientListScreen() {
           </ul>
         )}
       </div>
-
-      <Link
-        to="/clientes/nuevo"
-        aria-label="Nuevo cliente"
-        className="fixed bottom-6 right-6 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg"
-      >
-        <Plus size={26} />
-      </Link>
     </div>
   );
 }
