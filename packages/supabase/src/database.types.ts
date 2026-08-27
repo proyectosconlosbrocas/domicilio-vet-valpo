@@ -125,6 +125,34 @@ export interface Database {
           },
         ];
       };
+      agenda_visitas: {
+        Row: {
+          id: string;
+          cliente_id: string;
+          fecha: string;
+          notas: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          cliente_id: string;
+          fecha: string;
+          notas?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["agenda_visitas"]["Insert"]>;
+        Relationships: [
+          {
+            foreignKeyName: "agenda_visitas_cliente_id_fkey";
+            columns: ["cliente_id"];
+            isOneToOne: false;
+            referencedRelation: "clientes";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       visitas: {
         Row: {
           id: string;

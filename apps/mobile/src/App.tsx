@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useStaff } from "@/hooks/useStaff";
 import { HomeScreen } from "@/screens/HomeScreen";
+import { ScheduleVisitScreen } from "@/screens/ScheduleVisitScreen";
 import { ClientListScreen } from "@/screens/ClientListScreen";
 import { ClientDetailScreen } from "@/screens/ClientDetailScreen";
 import { ClientFormScreen } from "@/screens/ClientFormScreen";
@@ -42,6 +43,7 @@ function StaffGate({ session }: { session: Session }) {
         <Route path="/clientes" element={<ClientListScreen mode="ver" />} />
         <Route path="/clientes/editar" element={<ClientListScreen mode="editar" />} />
         <Route path="/clientes/nuevo" element={<ClientFormScreen />} />
+        <Route path="/agendar-visita" element={<ScheduleVisitScreen />} />
         <Route path="/clientes/:clienteId" element={<ClientDetailScreen />} />
         <Route path="/clientes/:clienteId/editar" element={<ClientFormScreen />} />
         <Route path="/clientes/:clienteId/mascotas/nueva" element={<PetFormScreen />} />
