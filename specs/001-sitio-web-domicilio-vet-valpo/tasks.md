@@ -192,6 +192,13 @@ Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la inst
 
 **Checkpoint**: APK debug regenerado (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`) con agendamiento y calendario funcionando contra la base real.
 
+## Fase 16: Navbar más chico + link "Clientes" diferenciado (P3) — 2026-08-27
+
+- [x] T065 Navbar web: se reduce el tamaño (padding 1rem→0.65rem, 0.6rem→0.45rem scrolled; logo 65px→52px; `navbar-brand` 1.5rem→1.25rem; breakpoints responsive ajustados proporcionalmente).
+- [x] T066 "Portal de Clientes" → **"Clientes"**, con estilo distinto al resto de los links (píldora blanca `.nav-link-cta` en vez de texto plano) para que se note que lleva a otra sección del sitio (el portal), no a un ancla de la landing. Verificado con Playwright: desktop, mobile colapsado y menú mobile abierto, local y producción.
+
+**Checkpoint**: desplegado a producción (`https://domicilio-vet-valpo.vercel.app/`), verificado en vivo con Playwright.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
