@@ -227,6 +227,15 @@ Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la inst
 
 **Checkpoint**: APK debug regenerado con la función de ubicación funcionando contra la base real.
 
+## Fase 20: Cliente rápido en agendar visita + WhatsApp directo por cliente (P1) — 2026-08-27
+
+- [x] T078 `ScheduleVisitScreen`: debajo del buscador, botón **"Crear cliente rápido"** que se transforma en mini-formulario (nombre + teléfono). Al crear, el cliente queda auto-seleccionado para la cita que se está agendando.
+- [x] T079 `apps/mobile/src/lib/whatsapp.ts`: helpers compartidos para armar links `wa.me` a partir del teléfono guardado (normaliza formatos comunes) con mensaje según contexto — confirmación de registro (incluye el Instagram del negocio) o confirmación de hora de visita (fecha + hora si está agendada). Incluye también un builder de mensaje de vacuna, listo para cuando exista una vista de vacunas por vencer.
+- [x] T080 Botón directo de WhatsApp agregado a toda card/fila de cliente: `ClientListScreen` (ver y editar), buscador de `ScheduleVisitScreen`, `ClientDetailScreen`, y cada cita en la lista de agendados de `HomeCalendar` (con mensaje de confirmación de hora).
+- [x] T081 Verificado end-to-end con Playwright contra la base real: cliente rápido creado y auto-seleccionado; botones de WhatsApp con href correcto (teléfono normalizado + mensaje con Instagram) en lista y ficha de cliente. Datos de prueba limpiados.
+
+**Checkpoint**: APK debug regenerado (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`), verificado también instalando el `.apk` real en un emulador Android (Pixel 7) además de Playwright.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
