@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Search, Check } from "lucide-react";
+import { Search, Check, UserPlus } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
 import { TextAreaField } from "@/components/fields";
+import { buildClienteWhatsappLink, buildRegistroMessage } from "@/lib/whatsapp";
 import type { Tables } from "@vetvalpo/supabase";
 
 type Cliente = Tables<"clientes">;
@@ -24,6 +26,11 @@ export function ScheduleVisitScreen() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [creandoCliente, setCreandoCliente] = useState(false);
+  const [nuevoNombre, setNuevoNombre] = useState("");
+  const [nuevoTelefono, setNuevoTelefono] = useState("");
+  const [creandoLoading, setCreandoLoading] = useState(false);
+
   useEffect(() => {
     let cancelled = false;
     supabase
@@ -38,6 +45,30 @@ export function ScheduleVisitScreen() {
       cancelled = true;
     };
   }, []);
+
+  async function handleCrearClienteRapido(e: FormEvent) {
+    e.preventDefault();
+    setCreandoLoading(true);
+    setError(null);
+
+    const { data, error: insertError } = await supabase
+      .from("clientes")
+      .insert({ nombre: nuevoNombre, telefono: nuevoTelefono || null })
+      .select("*")
+      .single();
+
+    setCreandoLoading(false);
+    if (insertError) {
+      setError(insertError.message);
+      return;
+    }
+
+    setClientes((prev) => [...(prev ?? []), data].sort((a, b) => a.nombre.localeCompare(b.nombre)));
+    setSeleccionado(data);
+    setCreandoCliente(false);
+    setNuevoNombre("");
+    setNuevoTelefono("");
+  }
 
   const filtered = useMemo(() => {
     if (!clientes) return [];
@@ -114,24 +145,84 @@ export function ScheduleVisitScreen() {
               />
             </div>
 
+            {creandoCliente ? (
+              <form onSubmit={handleCrearClienteRapido} className="mb-4 rounded-xl bg-white p-4 shadow-sm">
+                <p className="mb-3 text-sm font-semibold text-neutral-700">Cliente rápido</p>
+                <input
+                  type="text"
+                  required
+                  autoFocus
+                  placeholder="Nombre completo"
+                  value={nuevoNombre}
+                  onChange={(e) => setNuevoNombre(e.target.value)}
+                  className="mb-2 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <input
+                  type="tel"
+                  placeholder="Teléfono"
+                  value={nuevoTelefono}
+                  onChange={(e) => setNuevoTelefono(e.target.value)}
+                  className="mb-3 w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCreandoCliente(false)}
+                    className="flex-1 rounded-lg border border-neutral-300 py-2 text-sm font-medium text-neutral-600"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creandoLoading}
+                    className="flex-1 rounded-lg bg-primary py-2 text-sm font-semibold text-white disabled:opacity-60"
+                  >
+                    {creandoLoading ? "Creando…" : "Crear"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setCreandoCliente(true)}
+                className="mb-4 flex w-full items-center justify-center gap-2 rounded-lg border border-dashed border-primary py-2.5 text-sm font-semibold text-primary"
+              >
+                <UserPlus size={16} /> Crear cliente rápido
+              </button>
+            )}
+
             {clientes === null ? (
               <p className="text-center text-sm text-neutral-500">Cargando…</p>
             ) : filtered.length === 0 ? (
               <p className="text-center text-sm text-neutral-500">Sin resultados.</p>
             ) : (
               <ul className="mb-4 max-h-72 space-y-2 overflow-y-auto">
-                {filtered.map((cliente) => (
-                  <li key={cliente.id}>
-                    <button
-                      type="button"
-                      onClick={() => setSeleccionado(cliente)}
-                      className="block w-full rounded-xl bg-white p-3 text-left shadow-sm transition active:scale-[0.99]"
-                    >
-                      <p className="font-semibold text-neutral-800">{cliente.nombre}</p>
-                      <p className="text-sm text-neutral-500">{cliente.telefono ?? "Sin teléfono"}</p>
-                    </button>
-                  </li>
-                ))}
+                {filtered.map((cliente) => {
+                  const whatsappLink = buildClienteWhatsappLink(cliente.telefono, buildRegistroMessage(cliente.nombre));
+                  return (
+                    <li key={cliente.id} className="flex items-stretch gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSeleccionado(cliente)}
+                        className="block min-w-0 flex-1 rounded-xl bg-white p-3 text-left shadow-sm transition active:scale-[0.99]"
+                      >
+                        <p className="font-semibold text-neutral-800">{cliente.nombre}</p>
+                        <p className="text-sm text-neutral-500">{cliente.telefono ?? "Sin teléfono"}</p>
+                      </button>
+                      {whatsappLink && (
+                        <a
+                          href={whatsappLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`Escribir a ${cliente.nombre} por WhatsApp`}
+                          className="flex shrink-0 items-center justify-center rounded-xl bg-[#25D366] px-3.5 text-white shadow-sm transition active:scale-95"
+                        >
+                          <FaWhatsapp size={18} />
+                        </a>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             )}
           </>

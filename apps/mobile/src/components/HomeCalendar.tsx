@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, CalendarPlus, Pencil, Check } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { supabase } from "@/lib/supabase";
+import { buildClienteWhatsappLink, buildCitaMessage } from "@/lib/whatsapp";
 
 const CHILE_TZ = "America/Santiago";
 const WEEKDAY_LABELS = ["L", "M", "M", "J", "V", "S", "D"];
@@ -35,7 +37,7 @@ interface AgendaCliente {
   fecha: string;
   hora: string | null;
   cliente_id: string;
-  clientes: { nombre: string } | null;
+  clientes: { nombre: string; telefono: string | null } | null;
 }
 
 export function HomeCalendar() {
@@ -56,7 +58,7 @@ export function HomeCalendar() {
     setSelectedDay(null);
     supabase
       .from("agenda_visitas")
-      .select("id, fecha, hora, cliente_id, clientes(nombre)")
+      .select("id, fecha, hora, cliente_id, clientes(nombre, telefono)")
       .gte("fecha", firstDay)
       .lte("fecha", lastDay)
       .order("hora", { nullsFirst: false })
@@ -177,9 +179,29 @@ export function HomeCalendar() {
             <p className="mb-3 text-sm text-neutral-500">Sin citas.</p>
           ) : (
             <ul className="mb-3 space-y-2">
-              {seleccionados.map((item) => (
+              {seleccionados.map((item) => {
+                const whatsappLink = item.clientes
+                  ? buildClienteWhatsappLink(
+                      item.clientes.telefono,
+                      buildCitaMessage(item.clientes.nombre, item.fecha, item.hora)
+                    )
+                  : null;
+                return (
                 <li key={item.id} className="flex items-center justify-between gap-2 text-sm text-neutral-700">
                   <span className="min-w-0 truncate">{item.clientes?.nombre ?? "Cliente"}</span>
+
+                  <div className="flex shrink-0 items-center gap-2">
+                  {whatsappLink && (
+                    <a
+                      href={whatsappLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Confirmar por WhatsApp a ${item.clientes?.nombre}`}
+                      className="flex items-center justify-center rounded-md bg-[#25D366] p-1 text-white"
+                    >
+                      <FaWhatsapp size={14} />
+                    </a>
+                  )}
 
                   {editingId === item.id ? (
                     <div className="flex shrink-0 items-center gap-1">
@@ -212,8 +234,10 @@ export function HomeCalendar() {
                       <Pencil size={12} />
                     </button>
                   )}
+                  </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
 

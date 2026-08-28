@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Pencil, Phone, MapPin, Plus, PawPrint, Mail, Map } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
+import { buildClienteWhatsappLink, buildRegistroMessage } from "@/lib/whatsapp";
 import type { Tables } from "@vetvalpo/supabase";
 
 type ClienteConMascotas = Tables<"clientes"> & { mascotas: Tables<"mascotas">[] };
@@ -45,6 +47,8 @@ export function ClientDetailScreen() {
     );
   }
 
+  const whatsappLink = buildClienteWhatsappLink(cliente.telefono, buildRegistroMessage(cliente.nombre));
+
   return (
     <div className="min-h-screen bg-neutral-50 pb-20">
       <AppHeader
@@ -66,6 +70,16 @@ export function ClientDetailScreen() {
               <p className="flex items-center gap-2">
                 <Phone size={16} className="text-primary" /> {cliente.telefono}
               </p>
+            )}
+            {whatsappLink && (
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-1.5 text-sm font-medium text-white"
+              >
+                <FaWhatsapp size={16} /> Escribir por WhatsApp
+              </a>
             )}
             {cliente.email && (
               <p className="flex items-center gap-2">

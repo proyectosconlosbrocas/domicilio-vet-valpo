@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Search, PawPrint } from "lucide-react";
+import { FaWhatsapp } from "react-icons/fa";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
+import { buildClienteWhatsappLink, buildRegistroMessage } from "@/lib/whatsapp";
 import type { Tables } from "@vetvalpo/supabase";
 
 type ClienteConMascotas = Tables<"clientes"> & { mascotas: Tables<"mascotas">[] };
@@ -67,29 +69,43 @@ export function ClientListScreen({ mode }: ClientListScreenProps) {
           </p>
         ) : (
           <ul className="space-y-2">
-            {filtered.map((cliente) => (
-              <li key={cliente.id}>
-                <Link
-                  to={mode === "editar" ? `/clientes/${cliente.id}/editar` : `/clientes/${cliente.id}`}
-                  className="block rounded-xl bg-white p-4 shadow-sm transition active:scale-[0.99]"
-                >
-                  <p className="font-semibold text-neutral-800">{cliente.nombre}</p>
-                  <p className="text-sm text-neutral-500">{cliente.telefono ?? "Sin teléfono"}</p>
-                  {cliente.mascotas.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {cliente.mascotas.map((m) => (
-                        <span
-                          key={m.id}
-                          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
-                        >
-                          <PawPrint size={12} /> {m.nombre}
-                        </span>
-                      ))}
-                    </div>
+            {filtered.map((cliente) => {
+              const whatsappLink = buildClienteWhatsappLink(cliente.telefono, buildRegistroMessage(cliente.nombre));
+              return (
+                <li key={cliente.id} className="flex items-stretch gap-2">
+                  <Link
+                    to={mode === "editar" ? `/clientes/${cliente.id}/editar` : `/clientes/${cliente.id}`}
+                    className="block min-w-0 flex-1 rounded-xl bg-white p-4 shadow-sm transition active:scale-[0.99]"
+                  >
+                    <p className="font-semibold text-neutral-800">{cliente.nombre}</p>
+                    <p className="text-sm text-neutral-500">{cliente.telefono ?? "Sin teléfono"}</p>
+                    {cliente.mascotas.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {cliente.mascotas.map((m) => (
+                          <span
+                            key={m.id}
+                            className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary"
+                          >
+                            <PawPrint size={12} /> {m.nombre}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </Link>
+                  {whatsappLink && (
+                    <a
+                      href={whatsappLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Escribir a ${cliente.nombre} por WhatsApp`}
+                      className="flex shrink-0 items-center justify-center rounded-xl bg-[#25D366] px-4 text-white shadow-sm transition active:scale-95"
+                    >
+                      <FaWhatsapp size={20} />
+                    </a>
                   )}
-                </Link>
-              </li>
-            ))}
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
