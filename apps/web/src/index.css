@@ -1,10 +1,8 @@
-@import "./styles/legacy.css";
-
 @tailwind base;
 @tailwind components;
 
 /* Tokens de tema para los primitivos de shadcn/ui, mapeados a la paleta de
-   marca (--primary-color #FF3737 y compañía viven en legacy.css). */
+   marca (--red #FF3737 y compañía viven en styles/site.css). */
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -16,24 +14,26 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 29% 24%;
 
-    --primary: 0 100% 61%;
+    /* Rojo de marca oscurecido (#C41E1E): los primitivos llevan texto blanco
+       de 14px y el #FF3737 no llega a 4.5:1 con blanco. */
+    --primary: 0 73% 44%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 4 100% 95%;
-    --secondary-foreground: 0 100% 61%;
+    --secondary-foreground: 0 73% 44%;
 
     --muted: 0 43% 97%;
     --muted-foreground: 217 11% 40%;
 
     --accent: 4 100% 95%;
-    --accent-foreground: 0 100% 61%;
+    --accent-foreground: 0 73% 44%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 4 45% 92%;
     --input: 4 45% 92%;
-    --ring: 0 100% 61%;
+    --ring: 0 73% 44%;
 
     --radius: 0.85rem;
   }

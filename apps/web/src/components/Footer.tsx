@@ -1,24 +1,52 @@
-import { FaInstagram, FaWhatsapp } from "react-icons/fa";
+import { Link } from "react-router-dom";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
 
 export function Footer() {
   return (
-    <footer className="footer">
-      <div className="container mx-auto px-4 text-center">
-        <p className="mb-2">&copy; 2024 Domicilio Vet Valpo - Dra. Claudia Cárcamo</p>
-        <p className="mb-0">Atención veterinaria profesional a domicilio en Valparaíso y Viña del Mar</p>
-        <div className="social-links mt-3">
-          <a
-            href="https://www.instagram.com/domicilio.vet.valpo/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Instagram"
-          >
-            <FaInstagram />
-          </a>
-          <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-            <FaWhatsapp />
-          </a>
+    <footer className="site-footer">
+      <div className="wrap">
+        <p className="footer-name">Domicilio Vet Valpo</p>
+
+        <div className="footer-grid">
+          <div>
+            <h3>Atención</h3>
+            <p>
+              Veterinaria a domicilio con la Dra. Claudia Cárcamo.
+              <br />
+              Valparaíso y Viña del Mar, todos los días de 08:00 a 20:00.
+            </p>
+          </div>
+          <div>
+            <h3>Contacto</h3>
+            <ul>
+              <li>
+                <a href={`https://wa.me/${WHATSAPP_NUMBER}`} target="_blank" rel="noopener noreferrer">
+                  WhatsApp +56 9 6522 2368
+                </a>
+              </li>
+              <li>
+                <a href="https://www.instagram.com/domicilio.vet.valpo/" target="_blank" rel="noopener noreferrer">
+                  Instagram @domicilio.vet.valpo
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3>Clientes</h3>
+            <ul>
+              <li>
+                <Link to="/portal">Ver la ficha de mi mascota</Link>
+              </li>
+              <li>
+                <a href="/#servicios">Servicios y precios</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <span>&copy; {new Date().getFullYear()} Domicilio Vet Valpo</span>
+          <span>Dra. Claudia Cárcamo, médico veterinario</span>
         </div>
       </div>
     </footer>

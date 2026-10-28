@@ -2,16 +2,16 @@ import { test, expect } from "@playwright/test";
 
 test("la página carga y el hero renderiza", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: /Atención Veterinaria a Domicilio en Valparaíso/i })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: /Veterinaria a domicilio en Valparaíso/i })).toBeVisible();
   await expect(page.getByRole("link", { name: /Agendar por WhatsApp/i })).toBeVisible();
 });
 
 test("los enlaces de WhatsApp apuntan al número correcto; los que llevan mensaje son decodificables", async ({ page }) => {
   await page.goto("/");
   const links = await page.locator('a[href*="wa.me/56965222368"]').all();
-  // 6 servicios + 2 operativos + botón flotante + hero = 10 con mensaje pre-rellenado.
-  // "Agendar Consulta" (Sobre Mí) y el link de la ficha de contacto son bare a propósito,
-  // igual que en el sitio original — por eso el total de enlaces es 12, no 10.
+  // Con mensaje pre-rellenado: navbar, hero, 6 servicios, "Agendar con la doctora",
+  // 2 operativos, botón flotante y barra móvil. El número en "Agenda una visita" y
+  // el del footer son bare a propósito.
   expect(links.length).toBeGreaterThanOrEqual(12);
 
   let withMessage = 0;
@@ -61,7 +61,7 @@ test("el menú móvil se cierra al hacer click en un link", async ({ page }) => 
   await page.goto("/");
 
   await page.getByRole("button", { name: /abrir menú de navegación/i }).click();
-  const mobileServicesLink = page.locator("ul.flex.flex-col a", { hasText: "Servicios" });
+  const mobileServicesLink = page.locator("#mobile-menu a", { hasText: "Servicios" });
   await expect(mobileServicesLink).toBeVisible();
 
   await mobileServicesLink.click();

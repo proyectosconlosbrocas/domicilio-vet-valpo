@@ -12,7 +12,7 @@ interface UseInViewOptions {
  * nativo — sin dependencia nueva. Devuelve un ref para el elemento y un
  * booleano `isVisible` que se vuelve true cuando entra en viewport.
  * Respeta `prefers-reduced-motion` a través de la clase `.reveal` en
- * legacy.css (la transición se anula globalmente ahí, no acá).
+ * styles/site.css (con movimiento reducido, `.reveal` no oculta nada).
  */
 export function useInView<T extends HTMLElement = HTMLDivElement>({
   delay = 0,

@@ -4,10 +4,15 @@ import Autoplay from "embla-carousel-autoplay";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { heroCarouselImages } from "@/data/hero-carousel";
 
+const prefersReducedMotion =
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 export function HeroCarousel() {
-  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true }, [
-    Autoplay({ delay: 4000, stopOnInteraction: false, stopOnMouseEnter: true }),
-  ]);
+  // Con movimiento reducido no hay autoplay: las fotos se pasan a mano.
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    { loop: true },
+    prefersReducedMotion ? [] : [Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })]
+  );
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const scrollPrev = useCallback(() => emblaApi?.scrollPrev(), [emblaApi]);
@@ -24,8 +29,7 @@ export function HeroCarousel() {
     };
   }, [emblaApi]);
 
-  // Flechas del teclado cuando el carrusel tiene foco (mismo patrón que
-  // Bootstrap/embla no dan gratis: hay que cablearlo a mano).
+  // Flechas del teclado cuando el carrusel tiene foco (embla no lo trae de serie).
   function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key === "ArrowLeft") {
       event.preventDefault();
@@ -36,7 +40,7 @@ export function HeroCarousel() {
     }
   }
 
-  const currentAlt = heroCarouselImages[selectedIndex]?.alt ?? "";
+  const current = heroCarouselImages[selectedIndex];
 
   return (
     <div
@@ -44,39 +48,37 @@ export function HeroCarousel() {
       ref={emblaRef}
       role="region"
       aria-roledescription="carrusel"
-      aria-label="Fotos de Domicilio Vet Valpo"
+      aria-label="Fotos de visitas a domicilio"
       tabIndex={0}
       onKeyDown={handleKeyDown}
     >
       <div className="flex h-full">
-        {heroCarouselImages.map((image) => (
-          <div className="embla__slide" key={image.src}>
-            <img src={image.src} alt={image.alt} loading="lazy" />
+        {heroCarouselImages.map((image, index) => (
+          <div
+            className="embla__slide"
+            key={image.src}
+            role="group"
+            aria-roledescription="foto"
+            aria-label={`${index + 1} de ${heroCarouselImages.length}`}
+          >
+            <img
+              src={image.src}
+              alt={image.alt}
+              loading={index === 0 ? "eager" : "lazy"}
+            />
           </div>
         ))}
       </div>
 
-      {/* Anuncio para lectores de pantalla del slide actual, sin duplicar
-          visualmente el alt de cada <img> (ya visible/leído por su cuenta). */}
-      <span className="sr-only" aria-live="polite">
-        {`Foto ${selectedIndex + 1} de ${heroCarouselImages.length}: ${currentAlt}`}
-      </span>
+      <p className="hero-carousel-caption" aria-live="polite">
+        {current?.caption}
+      </p>
 
-      <button
-        type="button"
-        className="hero-carousel-control prev"
-        onClick={scrollPrev}
-        aria-label="Foto anterior"
-      >
-        <ChevronLeft size={20} />
+      <button type="button" className="hero-carousel-control prev" onClick={scrollPrev} aria-label="Foto anterior">
+        <ChevronLeft size={22} />
       </button>
-      <button
-        type="button"
-        className="hero-carousel-control next"
-        onClick={scrollNext}
-        aria-label="Foto siguiente"
-      >
-        <ChevronRight size={20} />
+      <button type="button" className="hero-carousel-control next" onClick={scrollNext} aria-label="Foto siguiente">
+        <ChevronRight size={22} />
       </button>
 
       <div className="hero-carousel-indicators">
@@ -85,8 +87,8 @@ export function HeroCarousel() {
             key={image.src}
             type="button"
             className={index === selectedIndex ? "active" : ""}
-            aria-label={`Foto ${index + 1}`}
-            aria-current={index === selectedIndex}
+            aria-label={`Ver foto ${index + 1}`}
+            aria-current={index === selectedIndex ? "true" : undefined}
             onClick={() => scrollTo(index)}
           />
         ))}

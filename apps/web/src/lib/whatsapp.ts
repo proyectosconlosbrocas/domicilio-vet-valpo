@@ -20,9 +20,15 @@ export interface ContactFormValues {
   name: string;
   phone: string;
   pet: string;
+  /** Servicio elegido en el formulario; vacío si no eligió ninguno. */
+  service: string;
   message: string;
 }
 
-export function buildWhatsappMessage({ name, phone, pet, message }: ContactFormValues): string {
-  return `Hola, mi nombre es ${name}. Mi mascota se llama ${pet}. ${message}. Mi teléfono es ${phone}.`;
+export function buildWhatsappMessage({ name, phone, pet, service, message }: ContactFormValues): string {
+  const parts = [`Hola, mi nombre es ${name}.`, `Mi mascota se llama ${pet}.`];
+  if (service) parts.push(`Necesito: ${service}.`);
+  if (message.trim()) parts.push(message.trim().replace(/[.!?]?$/, "."));
+  parts.push(`Mi teléfono es ${phone}.`);
+  return parts.join(" ");
 }

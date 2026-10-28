@@ -94,7 +94,7 @@ function PortalDashboard({ session }: { session: Session }) {
         )}
 
         {cliente.mascotas.length === 0 && !addingMascota ? (
-          <p className="text-sm text-neutral-500">Todavía no tenés mascotas registradas.</p>
+          <p className="text-sm text-neutral-500">Todavía no tienes mascotas registradas.</p>
         ) : (
           <div className="space-y-3">
             {cliente.mascotas.map((mascota) => (
@@ -113,7 +113,7 @@ export function PortalPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-neutral-50">
+      <main className="min-h-[100svh] bg-neutral-50">
         {session === undefined ? (
           <p className="p-8 text-center text-neutral-500">Cargando…</p>
         ) : session === null ? (

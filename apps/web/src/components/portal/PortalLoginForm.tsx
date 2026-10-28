@@ -48,9 +48,9 @@ export function PortalLoginForm() {
 
     if (authError) {
       if (authError.message.toLowerCase().includes("rate limit")) {
-        setError("Se alcanzó el límite de correos por ahora. Probá de nuevo en unos minutos.");
+        setError("Se alcanzó el límite de correos por ahora. Prueba de nuevo en unos minutos.");
       } else if (authError.message.toLowerCase().includes("already registered")) {
-        setError("Ese correo ya tiene una cuenta. Iniciá sesión en vez de crear una nueva.");
+        setError("Ese correo ya tiene una cuenta. Inicia sesión en vez de crear una nueva.");
       } else {
         setError(authError.message);
       }
@@ -69,9 +69,9 @@ export function PortalLoginForm() {
 
   if (confirmPending) {
     return (
-      <div className="mx-auto max-w-md rounded-2xl bg-white p-8 text-center shadow-lg">
+      <div className="mx-auto max-w-md rounded-2xl bg-white p-8 text-center border border-neutral-200">
         <Mail className="mx-auto mb-3 text-primary" size={40} />
-        <h2 className="mb-2 font-heading text-xl font-bold text-neutral-800">Confirmá tu correo</h2>
+        <h2 className="mb-2 font-heading text-xl font-bold text-neutral-800">Confirma tu correo</h2>
         <p className="text-sm text-neutral-500">
           Te enviamos un correo a <strong>{email}</strong> para confirmar tu cuenta. Una vez confirmada, iniciá
           sesión con tu correo y contraseña.
@@ -83,15 +83,15 @@ export function PortalLoginForm() {
   return (
     <form
       onSubmit={mode === "login" ? handleLogin : handleSignup}
-      className="mx-auto max-w-md rounded-2xl bg-white p-8 shadow-lg"
+      className="mx-auto max-w-md rounded-2xl bg-white p-8 border border-neutral-200"
     >
       <h1 className="mb-1 font-heading text-xl font-bold text-primary">
         {mode === "login" ? "Iniciar sesión" : "Crear cuenta"}
       </h1>
       <p className="mb-6 text-sm text-neutral-500">
         {mode === "login"
-          ? "Entrá con tu correo y contraseña para ver a tus mascotas."
-          : "Creá tu cuenta para registrar a tus mascotas y ver su historial."}
+          ? "Entra con tu correo y contraseña para ver a tus mascotas."
+          : "Crea tu cuenta para registrar a tus mascotas y ver su historial."}
       </p>
 
       {error && (
@@ -166,7 +166,7 @@ export function PortalLoginForm() {
         }}
         className="mt-4 w-full text-center text-sm font-medium text-primary underline"
       >
-        {mode === "login" ? "¿No tenés cuenta? Creála" : "¿Ya tenés cuenta? Iniciá sesión"}
+        {mode === "login" ? "¿No tienes cuenta? Créala" : "¿Ya tienes cuenta? Inicia sesión"}
       </button>
     </form>
   );

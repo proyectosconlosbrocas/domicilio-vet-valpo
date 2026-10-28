@@ -14,14 +14,15 @@ export function MobileCtaBar() {
   const { showBackToTop } = useScrollState();
 
   return (
-    <div className={`mobile-cta-bar ${showBackToTop ? "show" : ""}`}>
+    <div className={`mobile-cta-bar ${showBackToTop ? "show" : ""}`} aria-hidden={!showBackToTop}>
       <a
         href={buildWhatsappLink(WHATSAPP_GENERIC_MESSAGE)}
         target="_blank"
         rel="noopener noreferrer"
-        className="btn btn-whatsapp w-full"
+        className="btn btn-whatsapp"
+        tabIndex={showBackToTop ? 0 : -1}
       >
-        <FaWhatsapp /> Agendar por WhatsApp
+        <FaWhatsapp aria-hidden="true" /> Agendar por WhatsApp
       </a>
     </div>
   );

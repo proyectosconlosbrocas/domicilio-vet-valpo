@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { FaInstagram } from "react-icons/fa";
+import { galleryPhotos } from "@/data/gallery";
 import { useInView } from "@/hooks/use-in-view";
+
+const INSTAGRAM_URL = "https://www.instagram.com/domicilio.vet.valpo/";
+/** Por debajo de esto el feed se ve incompleto y se usan las fotos propias. */
+const MIN_FEED_POSTS = 4;
 
 interface InstagramPost {
   image_local_url?: string;
@@ -8,20 +13,24 @@ interface InstagramPost {
   post_page_url?: string;
 }
 
+interface Tile {
+  src: string;
+  alt: string;
+  href: string;
+}
+
 /**
- * Lee /instagram_posts.json (generado por instagram_fetcher.py) y renderiza
- * un grid de miniaturas. Tolerante a ambos formatos que ese script puede
- * producir (image_local_url + post_page_url, o solo url) y a que el archivo
- * no exista o esté vacío. Las URLs directas del CDN de Instagram son
- * firmadas y caducan a los pocos días: si una imagen falla se descarta solo
- * esa, y si fallan todas el grid queda vacío (oculto) y solo se ve el botón
- * "Síguenos en Instagram".
+ * Galería "En casa de nuestros pacientes". Intenta leer /instagram_posts.json
+ * (generado por instagram_fetcher.py, tolerante a sus dos formatos). Las URLs
+ * del CDN de Instagram son firmadas y caducan a los pocos días: si quedan
+ * menos de MIN_FEED_POSTS imágenes que cargan, se muestran las fotos propias
+ * de visitas (data/gallery.ts) en vez de dejar la sección vacía.
  */
 export function InstagramFeed() {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [failed, setFailed] = useState<Set<number>>(new Set());
-  const heading = useInView<HTMLDivElement>();
-  const grid = useInView<HTMLDivElement>({ delay: 100 });
+  const head = useInView<HTMLDivElement>();
+  const grid = useInView<HTMLDivElement>({ delay: 90 });
 
   useEffect(() => {
     let cancelled = false;
@@ -31,57 +40,61 @@ export function InstagramFeed() {
         if (!cancelled && Array.isArray(data)) setPosts(data);
       })
       .catch(() => {
-        // sin conexión, archivo ausente o JSON inválido: el grid queda vacío
+        // sin conexión, archivo ausente o JSON inválido: quedan las fotos propias
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const visiblePosts = posts.filter((_, index) => !failed.has(index));
+  const feedTiles: (Tile & { index: number })[] = posts.flatMap((post, index) => {
+    const src = post.image_local_url || post.url;
+    if (!src || failed.has(index)) return [];
+    return [{ index, src, alt: "Publicación de Domicilio Vet Valpo en Instagram", href: post.post_page_url || INSTAGRAM_URL }];
+  });
+  const useFeed = feedTiles.length >= MIN_FEED_POSTS;
+  const tiles: (Tile & { index?: number })[] = useFeed
+    ? feedTiles
+    : galleryPhotos.map((photo) => ({ ...photo, href: INSTAGRAM_URL }));
 
   return (
-    <section id="instagram-feed" className="instagram-section py-16">
-      <div className="container mx-auto px-4">
-        <div ref={heading.ref} className={`text-center reveal ${heading.isVisible ? "is-visible" : ""}`}>
-          <h2 className="section-title mb-3">Síguenos en Instagram</h2>
+    <section id="galeria" className="section">
+      <div className="wrap">
+        <div ref={head.ref} className={`section-head reveal ${head.isVisible ? "is-visible" : ""}`}>
+          <h2 className="section-title">En casa de nuestros pacientes</h2>
+          <p className="section-lead">
+            Patios, livings y operativos en los cerros: así se ve una visita de Domicilio Vet Valpo.
+          </p>
         </div>
 
-        {visiblePosts.length > 0 && (
-          <div ref={grid.ref} className={`instagram-grid mb-4 reveal ${grid.isVisible ? "is-visible" : ""}`}>
-            {posts.map((post, index) => {
-              if (failed.has(index)) return null;
-              const imageUrl = post.image_local_url || post.url;
-              if (!imageUrl) return null;
-              return (
-                <a
-                  key={index}
-                  className="instagram-grid-item"
-                  href={post.post_page_url || "https://www.instagram.com/domicilio.vet.valpo/"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Ver publicación en Instagram"
-                >
-                  <img
-                    src={imageUrl}
-                    alt="Publicación de Domicilio Vet Valpo en Instagram"
-                    loading="lazy"
-                    onError={() => setFailed((prev) => new Set(prev).add(index))}
-                  />
-                </a>
-              );
-            })}
-          </div>
-        )}
+        <div ref={grid.ref} className={`gallery reveal ${grid.isVisible ? "is-visible" : ""}`}>
+          {tiles.map((tile) => (
+            <a
+              key={tile.src}
+              className="gallery-item"
+              href={tile.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${tile.alt} (abre Instagram)`}
+            >
+              <img
+                src={tile.src}
+                alt={tile.alt}
+                loading="lazy"
+                onError={
+                  tile.index === undefined
+                    ? undefined
+                    : () => setFailed((prev) => new Set(prev).add(tile.index!))
+                }
+              />
+            </a>
+          ))}
+        </div>
 
-        <div className="text-center">
-          <a
-            href="https://www.instagram.com/domicilio.vet.valpo/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn btn-primary btn-lg"
-          >
-            <FaInstagram /> @domicilio.vet.valpo
+        <div className="gallery-footer">
+          <p>Más visitas y avisos de operativos en Instagram.</p>
+          <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className="btn btn-quiet btn-sm">
+            <FaInstagram aria-hidden="true" /> @domicilio.vet.valpo
           </a>
         </div>
       </div>

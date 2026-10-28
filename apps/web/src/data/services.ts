@@ -2,12 +2,10 @@ export interface Service {
   id: string;
   title: string;
   description: string;
-  /** 'photo': imagen real del servicio. 'icon-only': se muestra el ícono de marca centrado sobre gradiente. */
-  variant: "photo" | "icon-only";
+  /** 'featured': fila grande con foto y precio. 'more': bloque de "también a domicilio". */
+  variant: "featured" | "more";
   image: string;
   imageAlt: string;
-  icon: string;
-  iconAlt: string;
   priceFrom?: number;
   whatsappMessage: string;
 }
@@ -15,14 +13,12 @@ export interface Service {
 export const services: Service[] = [
   {
     id: "consulta",
-    title: "Consulta Veterinaria",
+    title: "Consulta a domicilio",
     description:
-      "Atención veterinaria completa en la comodidad de tu hogar. Agenda tu hora cualquier día previo contacto.",
-    variant: "photo",
-    image: "/assets/modificada.png",
-    imageAlt: "Consulta veterinaria a domicilio",
-    icon: "/assets/icon-estetoscopio.png",
-    iconAlt: "Icono estetoscopio",
+      "Examen completo, diagnóstico y tratamiento sin sacar a tu mascota de casa: menos estrés para ella y para ti. Atendemos todos los días, con hora previa.",
+    variant: "featured",
+    image: "/assets/IMG-20251110-WA0016.jpg",
+    imageAlt: "La doctora revisa a un perro en el living de su casa",
     priceFrom: 25000,
     whatsappMessage: "Hola, me interesa agendar una consulta veterinaria a domicilio",
   },
@@ -31,58 +27,48 @@ export const services: Service[] = [
     title: "Cirugía",
     description:
       "Realizamos procedimientos quirúrgicos, incluyendo esterilizaciones para caninos y felinos, con equipamiento especializado en tu domicilio.",
-    variant: "photo",
-    image: "/assets/hero-section.png",
-    imageAlt: "Cirugía veterinaria a domicilio",
-    icon: "/assets/icon-cruz-veterinaria.png",
-    iconAlt: "Icono cruz veterinaria",
+    variant: "featured",
+    image: "/assets/quirurjico.png",
+    imageAlt: "La doctora con mascarilla junto a un perro en la mesa de procedimientos",
     priceFrom: 80000,
     whatsappMessage: "Hola, necesito información sobre cirugía veterinaria a domicilio",
   },
   {
     id: "homeopatia",
-    title: "Tratamiento Homeopático",
-    description: "Medicina natural y holística personalizada para el bienestar integral de tu mascota.",
-    variant: "photo",
-    image: "/assets/homeopatia1.png",
-    imageAlt: "Tratamiento homeopático veterinario",
-    icon: "/assets/icon-pata-corazon.png",
-    iconAlt: "Icono pata con corazón",
+    title: "Homeopatía veterinaria",
+    description: "Tratamientos homeopáticos personalizados para el bienestar físico y emocional de tu mascota, como complemento de la medicina veterinaria.",
+    variant: "featured",
+    image: "/assets/foto2.png",
+    imageAlt: "La Dra. Claudia Cárcamo junto a un pendón de nanomedicina homeopática",
     priceFrom: 30000,
     whatsappMessage: "Hola, me interesa conocer sobre tratamientos homeopáticos veterinarios",
   },
   {
     id: "vacunacion",
-    title: "Vacunación y Prevención",
+    title: "Vacunas y desparasitación",
     description: "Protege a tu mascota con nuestros completos planes de vacunación y desparasitación a domicilio.",
-    variant: "icon-only",
-    image: "/assets/icon-jeringa.png",
-    imageAlt: "Vacunación y Prevención",
-    icon: "/assets/icon-jeringa.png",
-    iconAlt: "Icono jeringa",
+    variant: "more",
+    image: "/assets/IMG-20251110-WA0011.jpg",
+    imageAlt: "Vacunación de un perro en el patio de su casa",
     whatsappMessage: "Hola, quisiera consultar por vacunación y desparasitación",
   },
   {
     id: "procedimientos",
-    title: "Procedimientos y Microchip",
+    title: "Microchip y certificados",
     description:
       "Realizamos implantación de microchip, emitimos certificados de viaje y hacemos procedimientos de cuidado general.",
-    variant: "icon-only",
-    image: "/assets/icon-mascotas.png",
-    imageAlt: "Procedimientos y Microchip",
-    icon: "/assets/icon-mascotas.png",
-    iconAlt: "Icono mascotas",
+    variant: "more",
+    image: "/assets/IMG-20251110-WA0014.jpg",
+    imageAlt: "Procedimiento a un perro en el living de su familia",
     whatsappMessage: "Hola, quisiera consultar por procedimientos y microchip",
   },
   {
     id: "examenes",
-    title: "Exámenes y Diagnóstico",
+    title: "Exámenes y test rápidos",
     description: "Toma de muestras y test rápidos en tu hogar para un diagnóstico preciso y oportuno.",
-    variant: "icon-only",
-    image: "/assets/icon-estetoscopio.png",
-    imageAlt: "Exámenes y Diagnóstico",
-    icon: "/assets/icon-estetoscopio.png",
-    iconAlt: "Icono estetoscopio",
+    variant: "more",
+    image: "/assets/IMG-20251110-WA0019.jpg",
+    imageAlt: "Examen de oído a un perro en su casa",
     whatsappMessage: "Hola, quisiera consultar por exámenes y diagnóstico",
   },
 ];

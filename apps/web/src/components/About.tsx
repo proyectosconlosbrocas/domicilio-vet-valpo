@@ -1,63 +1,53 @@
-import { Award } from "lucide-react";
+import { Check } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
-import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { buildWhatsappLink } from "@/lib/whatsapp";
 import { useInView } from "@/hooks/use-in-view";
 
 const EXPERTISE = [
-  { icon: "/assets/icon-pata-corazon.png", alt: "Icono homeopatía", label: "Especialista en Homeopatía Veterinaria" },
-  { icon: "/assets/icon-mascotas.png", alt: "Icono atención domicilio", label: "Atención Integral a Domicilio" },
-  { icon: "/assets/icon-cruz-veterinaria.png", alt: "Icono cirugías", label: "Cirugías Menores y Esterilizaciones" },
-  { icon: "/assets/icon-jeringa.png", alt: "Icono vacunación", label: "Medicina Preventiva y Vacunación" },
+  "Homeopatía veterinaria",
+  "Atención integral a domicilio",
+  "Cirugías menores y esterilizaciones",
+  "Medicina preventiva y vacunación",
 ];
 
 export function About() {
-  const image = useInView<HTMLDivElement>();
-  const content = useInView<HTMLDivElement>({ delay: 100 });
+  const image = useInView<HTMLElement>();
+  const content = useInView<HTMLDivElement>({ delay: 90 });
 
   return (
-    <section id="sobre-mi" className="about-section py-16">
-      <div className="container mx-auto px-4">
-        <div className="grid items-center gap-10 lg:grid-cols-12">
-          <div ref={image.ref} className={`reveal lg:col-span-5 ${image.isVisible ? "is-visible" : ""}`}>
-            <div className="about-image-wrapper">
-              <img
-                src="/assets/doctora-claudia-carcamo.jpg"
-                alt="Dra. Claudia Cárcamo"
-                className="w-full rounded-2xl shadow"
-                loading="lazy"
-              />
-              <div className="about-badge">
-                <Award />
-                <span>Médico Veterinario Certificado</span>
-              </div>
-            </div>
-          </div>
+    <section id="sobre-mi" className="section section-alt">
+      <div className="wrap about-grid">
+        <figure ref={image.ref} className={`about-figure reveal ${image.isVisible ? "is-visible" : ""}`}>
+          <img src="/assets/doctora-claudia-carcamo.jpg" alt="Retrato de la Dra. Claudia Cárcamo" loading="lazy" />
+          <figcaption>Dra. Claudia Cárcamo, médico veterinario titulada.</figcaption>
+        </figure>
 
-          <div ref={content.ref} className={`reveal lg:col-span-7 ${content.isVisible ? "is-visible" : ""}`}>
-            <h2 className="section-title mb-4">Dra. Claudia Cárcamo</h2>
-            <p className="about-text">
-              Médico Veterinario titulada con especialización en medicina homeopática y atención a domicilio. Mi
-              pasión es brindar cuidados personalizados que respeten la naturaleza de cada animal.
-            </p>
-            <div className="expertise-list">
-              {EXPERTISE.map((item) => (
-                <div className="expertise-item" key={item.label}>
-                  <span className="expertise-icon-badge">
-                    <img src={item.icon} alt={item.alt} className="expertise-icon" />
-                  </span>
-                  <span>{item.label}</span>
-                </div>
-              ))}
-            </div>
-            <a
-              href={`https://wa.me/${WHATSAPP_NUMBER}`}
-              className="btn btn-primary btn-lg mt-4"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaWhatsapp /> Agendar Consulta
-            </a>
-          </div>
+        <div ref={content.ref} className={`about-body reveal ${content.isVisible ? "is-visible" : ""}`}>
+          <h2 className="section-title">Dra. Claudia Cárcamo</h2>
+          <p className="section-lead">
+            Médico veterinario titulada, con especialización en medicina homeopática y atención a domicilio. Mi
+            pasión es brindar cuidados personalizados que respeten la naturaleza de cada animal.
+          </p>
+          <p>
+            Atender en casa permite ver a cada mascota en su ambiente, tranquila y sin el estrés del traslado. Creo en
+            una medicina que fortalece la salud de manera integral, respetando el equilibrio y las necesidades
+            individuales de cada animal.
+          </p>
+          <ul className="check-list two-col">
+            {EXPERTISE.map((item) => (
+              <li key={item}>
+                <Check size={20} aria-hidden="true" /> {item}
+              </li>
+            ))}
+          </ul>
+          <a
+            href={buildWhatsappLink("Hola Dra. Claudia, quisiera agendar una consulta para mi mascota")}
+            className="btn btn-whatsapp"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <FaWhatsapp aria-hidden="true" /> Agendar con la doctora
+          </a>
         </div>
       </div>
     </section>

@@ -1,14 +1,13 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { FaWhatsapp } from "react-icons/fa";
+import { services } from "@/data/services";
 import { buildWhatsappLink, buildWhatsappMessage, type ContactFormValues } from "@/lib/whatsapp";
 
-const EMPTY_FORM: ContactFormValues = { name: "", phone: "", pet: "", message: "" };
+const EMPTY_FORM: ContactFormValues = { name: "", phone: "", pet: "", service: "", message: "" };
+const SERVICE_OPTIONS = services.map((service) => service.title);
 
 export function ContactForm() {
   const [values, setValues] = useState<ContactFormValues>(EMPTY_FORM);
-  const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<"idle" | "success">("idle");
 
   function handleChange(field: keyof ContactFormValues) {
@@ -19,73 +18,80 @@ export function ContactForm() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitting(true);
-    setStatus("idle");
-
-    // Pequeño delay para mejor UX antes de abrir WhatsApp (igual que el sitio original)
-    window.setTimeout(() => {
-      window.open(buildWhatsappLink(buildWhatsappMessage(values)), "_blank");
-      setStatus("success");
-      setValues(EMPTY_FORM);
-      setSubmitting(false);
-      window.setTimeout(() => setStatus("idle"), 5000);
-    }, 800);
+    // window.open tiene que ir dentro del mismo gesto del usuario: si se
+    // difiere con un setTimeout, Safari y varios navegadores móviles lo
+    // bloquean como popup.
+    window.open(buildWhatsappLink(buildWhatsappMessage(values)), "_blank", "noopener");
+    setStatus("success");
+    setValues(EMPTY_FORM);
+    window.setTimeout(() => setStatus("idle"), 6000);
   }
 
   return (
-    <div className="contact-form-wrapper">
-      <form onSubmit={handleSubmit}>
-        {status === "success" && (
-          <div className="form-message success show" role="alert" aria-live="polite">
-            ¡Listo! Te estamos redirigiendo a WhatsApp para continuar la conversación.
-          </div>
-        )}
+    <form className="contact-form" onSubmit={handleSubmit}>
+      <h3 className="contact-form-title">Escríbenos tu caso</h3>
+      <p className="contact-form-note">Armamos el mensaje y lo abrimos en WhatsApp para que solo tengas que enviarlo.</p>
 
-        <div className="mb-3">
-          <Label htmlFor="name" className="mb-2 block">
-            Nombre
-          </Label>
-          <Input id="name" required value={values.name} onChange={handleChange("name")} aria-label="Nombre completo" />
+      {status === "success" && (
+        <div className="form-message success" role="status">
+          Listo, abrimos WhatsApp con tu mensaje. Si no se abrió, escríbenos al +56 9 6522 2368.
         </div>
+      )}
 
-        <div className="mb-3">
-          <Label htmlFor="phone" className="mb-2 block">
-            Teléfono
-          </Label>
-          <Input
+      <div className="field-row">
+        <div className="field">
+          <label htmlFor="name">Tu nombre</label>
+          <input id="name" required autoComplete="name" value={values.name} onChange={handleChange("name")} />
+        </div>
+        <div className="field">
+          <label htmlFor="phone">Teléfono</label>
+          <input
             id="phone"
             type="tel"
             required
+            autoComplete="tel"
+            inputMode="tel"
+            placeholder="+56 9 1234 5678"
             value={values.phone}
             onChange={handleChange("phone")}
-            aria-label="Número de teléfono"
           />
         </div>
+      </div>
 
-        <div className="mb-3">
-          <Label htmlFor="pet" className="mb-2 block">
-            Nombre de tu mascota
-          </Label>
-          <Input id="pet" required value={values.pet} onChange={handleChange("pet")} aria-label="Nombre de tu mascota" />
-        </div>
+      <div className="field">
+        <label htmlFor="pet">Nombre de tu mascota</label>
+        <input id="pet" required value={values.pet} onChange={handleChange("pet")} />
+      </div>
 
-        <div className="mb-3">
-          <Label htmlFor="message" className="mb-2 block">
-            Mensaje
-          </Label>
-          <Textarea id="message" rows={4} required value={values.message} onChange={handleChange("message")} />
-        </div>
+      <fieldset className="chips">
+        <legend>
+          ¿Qué necesitas? <span className="optional">(opcional)</span>
+        </legend>
+        {SERVICE_OPTIONS.map((option) => (
+          <label className="chip" key={option}>
+            <input
+              type="radio"
+              name="service"
+              value={option}
+              checked={values.service === option}
+              onChange={handleChange("service")}
+              onClick={() => values.service === option && setValues((prev) => ({ ...prev, service: "" }))}
+            />
+            <span>{option}</span>
+          </label>
+        ))}
+      </fieldset>
 
-        <button type="submit" className="btn btn-primary w-full" disabled={submitting}>
-          {submitting ? (
-            <svg className="spinner" viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" strokeDasharray="31.4" strokeDashoffset="10" />
-            </svg>
-          ) : (
-            <span>Enviar por WhatsApp</span>
-          )}
-        </button>
-      </form>
-    </div>
+      <div className="field">
+        <label htmlFor="message">
+          Cuéntanos qué le pasa <span className="optional">(opcional)</span>
+        </label>
+        <textarea id="message" rows={4} value={values.message} onChange={handleChange("message")} />
+      </div>
+
+      <button type="submit" className="btn btn-whatsapp w-full">
+        <FaWhatsapp aria-hidden="true" /> Enviar por WhatsApp
+      </button>
+    </form>
   );
 }

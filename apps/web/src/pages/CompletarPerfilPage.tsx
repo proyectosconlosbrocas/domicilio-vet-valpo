@@ -89,8 +89,8 @@ function CompletarPerfilForm({ authUserId, email }: { authUserId: string; email:
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mx-auto max-w-lg rounded-2xl bg-white p-8 shadow-lg">
-      <h1 className="mb-1 font-heading text-xl font-bold text-primary">Completá tu perfil</h1>
+    <form onSubmit={handleSubmit} className="mx-auto max-w-lg rounded-2xl bg-white p-8 border border-neutral-200">
+      <h1 className="mb-1 font-heading text-xl font-bold text-primary">Completa tu perfil</h1>
       <p className="mb-6 text-sm text-neutral-500">Ya iniciaste sesión — contanos de vos y de tu mascota.</p>
 
       {error && (
@@ -169,7 +169,7 @@ export function CompletarPerfilPage() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-neutral-50 px-4 py-10">
+      <main className="min-h-[100svh] bg-neutral-50 px-4 py-10">
         {session === undefined ? (
           <p className="p-8 text-center text-neutral-500">Cargando…</p>
         ) : session === null ? (

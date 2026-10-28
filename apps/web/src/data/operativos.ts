@@ -5,10 +5,8 @@ export interface Operativo {
   description: string;
   image: string;
   imageAlt: string;
-  /** para .esterilizacion-image-container (object-position: bottom) */
+  /** encuadra la parte baja de la foto (.operativo-media.bottom) */
   imagePositionBottom?: boolean;
-  icon: string;
-  iconAlt: string;
   features: string[];
   whatsappMessage: string;
 }
@@ -23,8 +21,6 @@ export const operativos: Operativo[] = [
     image: "/assets/modificada.png",
     imageAlt: "Operativo de esterilización veterinaria",
     imagePositionBottom: true,
-    icon: "/assets/icon-cruz-veterinaria.png",
-    iconAlt: "Icono esterilización",
     features: [
       "Cirugía segura con anestesia controlada",
       "Equipo veterinario completo",
@@ -41,8 +37,6 @@ export const operativos: Operativo[] = [
       "Jornadas preventivas de desparasitación interna y externa para proteger a tu mascota de parásitos. Servicios rápidos y efectivos que previenen enfermedades y mejoran la calidad de vida de tus compañeros.",
     image: "/assets/operativo-desparasitacion.jpg",
     imageAlt: "Operativo de desparasitación veterinaria",
-    icon: "/assets/icon-jeringa.png",
-    iconAlt: "Icono desparasitación",
     features: [
       "Desparasitación interna y externa",
       "Productos de alta calidad",

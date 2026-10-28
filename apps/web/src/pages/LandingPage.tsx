@@ -20,8 +20,8 @@ export function LandingPage() {
       <main id="main-content">
         <Hero />
         <Services />
-        <Operativos />
         <About />
+        <Operativos />
         <InstagramFeed />
         <Contact />
       </main>
