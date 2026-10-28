@@ -2,7 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "Inter", "Segoe UI", sans-serif;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  body {
+    @apply bg-neutral-50 font-body text-ink antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior-y: none;
+  }
+
+  /* 16px en campos: por debajo, el WebView hace zoom al enfocar. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary-ink ring-offset-2;
+  }
 }

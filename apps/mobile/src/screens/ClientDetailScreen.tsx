@@ -1,13 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Pencil, Phone, MapPin, Plus, PawPrint, Mail, Map } from "lucide-react";
+import { Pencil, Phone, MapPin, Plus, PawPrint, Mail, Navigation, ChevronRight, CalendarPlus, ShieldAlert } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { supabase } from "@/lib/supabase";
-import { AppHeader } from "@/components/AppHeader";
+import { AppHeader, headerIconClass } from "@/components/AppHeader";
+import { EmptyState, Loading, Section } from "@/components/ui";
 import { buildClienteWhatsappLink, buildRegistroMessage } from "@/lib/whatsapp";
 import type { Tables } from "@vetvalpo/supabase";
 
 type ClienteConMascotas = Tables<"clientes"> & { mascotas: Tables<"mascotas">[] };
+
+const quickActionClass =
+  "flex min-h-16 flex-1 flex-col items-center justify-center gap-1 rounded-2xl text-xs font-semibold active:scale-[0.97] transition";
 
 export function ClientDetailScreen() {
   const { clienteId } = useParams<{ clienteId: string }>();
@@ -29,124 +33,161 @@ export function ClientDetailScreen() {
     };
   }, [clienteId]);
 
-  if (cliente === undefined) {
+  if (cliente === undefined || cliente === null) {
     return (
       <div className="min-h-screen bg-neutral-50">
         <AppHeader title="Cliente" back />
-        <p className="p-4 text-center text-sm text-neutral-500">Cargando…</p>
-      </div>
-    );
-  }
-
-  if (cliente === null) {
-    return (
-      <div className="min-h-screen bg-neutral-50">
-        <AppHeader title="Cliente" back />
-        <p className="p-4 text-center text-sm text-neutral-500">No se encontró el cliente.</p>
+        {cliente === undefined ? <Loading /> : <div className="p-4"><EmptyState>No se encontró el cliente.</EmptyState></div>}
       </div>
     );
   }
 
   const whatsappLink = buildClienteWhatsappLink(cliente.telefono, buildRegistroMessage(cliente.nombre));
+  const tieneUbicacion = cliente.direccion_lat != null && cliente.direccion_lng != null;
+  const mapsLink = tieneUbicacion
+    ? `https://www.google.com/maps/dir/?api=1&destination=${cliente.direccion_lat},${cliente.direccion_lng}`
+    : cliente.direccion
+      ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(cliente.direccion)}`
+      : null;
 
   return (
-    <div className="min-h-screen bg-neutral-50 pb-20">
+    <div className="min-h-screen bg-neutral-50 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
       <AppHeader
         title={cliente.nombre}
         subtitle={cliente.rut ?? undefined}
         back
         action={
-          <Link to={`/clientes/${cliente.id}/editar`} aria-label="Editar cliente">
+          <Link to={`/clientes/${cliente.id}/editar`} aria-label="Editar cliente" className={headerIconClass}>
             <Pencil size={20} />
           </Link>
         }
       />
 
       <div className="space-y-4 p-4">
-        <section className="rounded-xl bg-white p-4 shadow-sm">
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">Contacto</h2>
-          <div className="space-y-2 text-sm text-neutral-700">
+        {/* Las tres cosas que se hacen con un cliente en terreno, al alcance del pulgar. */}
+        <div className="flex gap-2">
+          {cliente.telefono && (
+            <a href={`tel:${cliente.telefono}`} className={`${quickActionClass} border border-neutral-200 bg-white text-ink`}>
+              <Phone size={20} /> Llamar
+            </a>
+          )}
+          {whatsappLink && (
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${quickActionClass} bg-whatsapp text-white`}
+            >
+              <FaWhatsapp size={20} /> WhatsApp
+            </a>
+          )}
+          {mapsLink && (
+            <a
+              href={mapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${quickActionClass} border border-neutral-200 bg-white text-ink`}
+            >
+              <Navigation size={20} /> Cómo llegar
+            </a>
+          )}
+        </div>
+
+        <Section title="Contacto">
+          <dl className="space-y-3 text-sm">
             {cliente.telefono && (
-              <p className="flex items-center gap-2">
-                <Phone size={16} className="text-primary" /> {cliente.telefono}
-              </p>
-            )}
-            {whatsappLink && (
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-1.5 text-sm font-medium text-white"
-              >
-                <FaWhatsapp size={16} /> Escribir por WhatsApp
-              </a>
+              <div className="flex items-start gap-3">
+                <Phone size={17} className="mt-0.5 shrink-0 text-neutral-400" aria-hidden="true" />
+                <div>
+                  <dt className="sr-only">Teléfono</dt>
+                  <dd className="text-ink">
+                    {cliente.telefono}
+                    {cliente.telefono_alternativo && (
+                      <span className="text-neutral-500"> · {cliente.telefono_alternativo}</span>
+                    )}
+                  </dd>
+                </div>
+              </div>
             )}
             {cliente.email && (
-              <p className="flex items-center gap-2">
-                <Mail size={16} className="text-primary" /> {cliente.email}
-              </p>
+              <div className="flex items-start gap-3">
+                <Mail size={17} className="mt-0.5 shrink-0 text-neutral-400" aria-hidden="true" />
+                <div className="min-w-0">
+                  <dt className="sr-only">Email</dt>
+                  <dd className="break-words text-ink">{cliente.email}</dd>
+                </div>
+              </div>
             )}
-            {cliente.direccion && (
-              <p className="flex items-center gap-2">
-                <MapPin size={16} className="text-primary" /> {cliente.direccion}
-              </p>
-            )}
-            {cliente.direccion_lat != null && cliente.direccion_lng != null && (
-              <a
-                href={`https://www.google.com/maps?q=${cliente.direccion_lat},${cliente.direccion_lng}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-1 inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1.5 text-sm font-medium text-primary"
-              >
-                <Map size={16} /> Ver en Google Maps
-              </a>
-            )}
+            <div className="flex items-start gap-3">
+              <MapPin size={17} className="mt-0.5 shrink-0 text-neutral-400" aria-hidden="true" />
+              <div>
+                <dt className="sr-only">Dirección</dt>
+                <dd className="text-ink">
+                  {cliente.direccion || <span className="text-neutral-500">Sin dirección</span>}
+                  {tieneUbicacion && <span className="block text-xs text-neutral-500">Ubicación GPS guardada</span>}
+                </dd>
+              </div>
+            </div>
             {cliente.contacto_emergencia_nombre && (
-              <p className="text-neutral-500">
-                Emergencia: {cliente.contacto_emergencia_nombre}
-                {cliente.contacto_emergencia_telefono && ` — ${cliente.contacto_emergencia_telefono}`}
-              </p>
+              <div className="flex items-start gap-3">
+                <ShieldAlert size={17} className="mt-0.5 shrink-0 text-neutral-400" aria-hidden="true" />
+                <div>
+                  <dt className="text-xs text-neutral-500">Emergencia</dt>
+                  <dd className="text-ink">
+                    {cliente.contacto_emergencia_nombre}
+                    {cliente.contacto_emergencia_telefono && (
+                      <a href={`tel:${cliente.contacto_emergencia_telefono}`} className="block font-medium text-primary-ink">
+                        {cliente.contacto_emergencia_telefono}
+                      </a>
+                    )}
+                  </dd>
+                </div>
+              </div>
             )}
-          </div>
-        </section>
+          </dl>
+        </Section>
 
-        <section>
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">Mascotas</h2>
+        <Section
+          title={`Mascotas (${cliente.mascotas.length})`}
+          action={
             <Link
               to={`/clientes/${cliente.id}/mascotas/nueva`}
-              className="flex items-center gap-1 text-sm font-medium text-primary"
+              className="-my-2 flex min-h-11 items-center gap-1 text-sm font-semibold text-primary-ink"
             >
               <Plus size={16} /> Agregar
             </Link>
-          </div>
-
+          }
+        >
           {cliente.mascotas.length === 0 ? (
             <p className="text-sm text-neutral-500">Sin mascotas registradas.</p>
           ) : (
-            <ul className="space-y-2">
+            <ul className="-mx-4 -mb-4 divide-y divide-neutral-100 border-t border-neutral-100">
               {cliente.mascotas.map((mascota) => (
                 <li key={mascota.id}>
-                  <Link
-                    to={`/mascotas/${mascota.id}`}
-                    className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm transition active:scale-[0.99]"
-                  >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                      <PawPrint size={20} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-semibold text-neutral-800">{mascota.nombre}</p>
-                      <p className="text-sm text-neutral-500">
+                  <Link to={`/mascotas/${mascota.id}`} className="flex min-h-16 items-center gap-3 px-4 active:bg-neutral-50">
+                    <PawPrint size={20} className="shrink-0 text-primary-ink" aria-hidden="true" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-semibold text-ink">{mascota.nombre}</p>
+                      <p className="truncate text-sm text-neutral-500">
                         {mascota.especie}
                         {mascota.raza ? ` · ${mascota.raza}` : ""}
+                        {mascota.estado !== "activo" ? ` · ${mascota.estado}` : ""}
                       </p>
                     </div>
+                    <ChevronRight size={18} className="text-neutral-400" aria-hidden="true" />
                   </Link>
                 </li>
               ))}
             </ul>
           )}
-        </section>
+        </Section>
+
+        <Link
+          to={`/agendar-visita?cliente=${cliente.id}`}
+          className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary-soft font-heading font-semibold text-primary-ink"
+        >
+          <CalendarPlus size={18} /> Agendar visita para {cliente.nombre.split(" ")[0]}
+        </Link>
       </div>
     </div>
   );

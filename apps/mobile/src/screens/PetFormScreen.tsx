@@ -2,7 +2,8 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
-import { TextField, SelectField, TextAreaField } from "@/components/fields";
+import { TextField, SelectField, TextAreaField, fieldClass } from "@/components/fields";
+import { BottomBar, ErrorBanner, Loading, Section, buttonClass, friendlyError } from "@/components/ui";
 import type { TablesInsert } from "@vetvalpo/supabase";
 
 type FormValues = Omit<TablesInsert<"mascotas">, "id" | "cliente_id" | "created_at" | "updated_at" | "foto_url">;
@@ -81,6 +82,8 @@ export function PetFormScreen() {
 
     const payload = {
       ...values,
+      nombre: values.nombre.trim(),
+      especie: values.especie.trim(),
       raza: values.raza || null,
       fecha_nacimiento: values.fecha_nacimiento || null,
       color: values.color || null,
@@ -101,102 +104,135 @@ export function PetFormScreen() {
 
     setSaving(false);
     if (result.error) {
-      setError(result.error.message);
+      setError(friendlyError(result.error.message));
       return;
     }
     navigate(`/mascotas/${result.data.id}`, { replace: true });
   }
 
+  const title = isEdit ? "Editar mascota" : "Nueva mascota";
+
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-50">
-        <AppHeader title={isEdit ? "Editar mascota" : "Nueva mascota"} back />
-        <p className="p-4 text-center text-sm text-neutral-500">Cargando…</p>
+        <AppHeader title={title} back />
+        <Loading />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <AppHeader title={isEdit ? "Editar mascota" : "Nueva mascota"} back />
+    <div className="min-h-screen bg-neutral-50 pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      <AppHeader title={title} back />
 
-      <form onSubmit={handleSubmit} className="p-4">
-        {error && (
-          <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
-            {error}
-          </p>
-        )}
+      <form id="mascota-form" onSubmit={handleSubmit} className="space-y-4 p-4">
+        <ErrorBanner message={error} />
 
-        <TextField id="nombre" label="Nombre" required value={values.nombre} onChange={handleChange("nombre")} />
-        <TextField id="especie" label="Especie" required placeholder="Perro, gato…" value={values.especie} onChange={handleChange("especie")} />
-        <TextField id="raza" label="Raza" value={values.raza ?? ""} onChange={handleChange("raza")} />
-
-        <SelectField id="sexo" label="Sexo" value={values.sexo ?? "desconocido"} onChange={handleChange("sexo")}>
-          <option value="macho">Macho</option>
-          <option value="hembra">Hembra</option>
-          <option value="desconocido">Desconocido</option>
-        </SelectField>
-
-        <div className="mb-4 flex items-center gap-2">
-          <input
-            id="esterilizado"
-            type="checkbox"
-            checked={values.esterilizado ?? false}
-            onChange={(e) => setValues((prev) => ({ ...prev, esterilizado: e.target.checked }))}
-            className="h-4 w-4 accent-primary"
-          />
-          <label htmlFor="esterilizado" className="text-sm text-neutral-700">
-            Esterilizado/a
-          </label>
-        </div>
-
-        <TextField
-          id="fecha_nacimiento"
-          label="Fecha de nacimiento"
-          type="date"
-          value={values.fecha_nacimiento ?? ""}
-          onChange={handleChange("fecha_nacimiento")}
-        />
-        <TextField id="color" label="Color" value={values.color ?? ""} onChange={handleChange("color")} />
-        <TextField
-          id="peso_actual"
-          label="Peso actual (kg)"
-          type="number"
-          step="0.1"
-          value={values.peso_actual ?? ""}
-          onChange={handleChange("peso_actual")}
-        />
-        <TextField id="microchip" label="Microchip" value={values.microchip ?? ""} onChange={handleChange("microchip")} />
-        <TextAreaField id="alergias" label="Alergias" value={values.alergias ?? ""} onChange={handleChange("alergias")} />
-        <TextAreaField
-          id="condiciones_cronicas"
-          label="Condiciones crónicas"
-          value={values.condiciones_cronicas ?? ""}
-          onChange={handleChange("condiciones_cronicas")}
-        />
-        <TextField
-          id="temperamento"
-          label="Temperamento"
-          value={values.temperamento ?? ""}
-          onChange={handleChange("temperamento")}
-        />
-
-        {isEdit && (
-          <SelectField id="estado" label="Estado" value={values.estado} onChange={handleChange("estado")}>
-            <option value="activo">Activo</option>
-            <option value="fallecido">Fallecido</option>
-            <option value="adoptado">Adoptado</option>
+        <Section title="Identificación">
+          <TextField id="nombre" label="Nombre" required autoCapitalize="words" value={values.nombre} onChange={handleChange("nombre")} />
+          <div className="mb-4">
+            <span className="mb-1.5 block text-sm font-medium text-neutral-700">
+              Especie <span className="text-primary-ink">*</span>
+            </span>
+            {/* Atajos para los dos casos del 99%; el campo sigue aceptando cualquier especie. */}
+            <div className="mb-2 flex gap-2">
+              {["Perro", "Gato"].map((opcion) => (
+                <button
+                  key={opcion}
+                  type="button"
+                  aria-pressed={values.especie === opcion}
+                  onClick={() => setValues((prev) => ({ ...prev, especie: opcion }))}
+                  className={`min-h-11 flex-1 rounded-xl border text-sm font-semibold transition ${
+                    values.especie === opcion
+                      ? "border-ink bg-ink text-white"
+                      : "border-neutral-300 bg-white text-ink active:bg-neutral-100"
+                  }`}
+                >
+                  {opcion}
+                </button>
+              ))}
+            </div>
+            <input
+              id="especie"
+              required
+              aria-label="Especie"
+              placeholder="u otra: conejo, hurón…"
+              value={values.especie}
+              onChange={handleChange("especie")}
+              className={fieldClass}
+            />
+          </div>
+          <TextField id="raza" label="Raza" value={values.raza ?? ""} onChange={handleChange("raza")} />
+          <SelectField id="sexo" label="Sexo" value={values.sexo ?? "desconocido"} onChange={handleChange("sexo")}>
+            <option value="macho">Macho</option>
+            <option value="hembra">Hembra</option>
+            <option value="desconocido">Desconocido</option>
           </SelectField>
-        )}
+          <label
+            htmlFor="esterilizado"
+            className="mb-4 flex min-h-12 items-center justify-between gap-3 rounded-xl border border-neutral-300 px-3.5"
+          >
+            <span className="text-base text-ink">Esterilizado/a</span>
+            <input
+              id="esterilizado"
+              type="checkbox"
+              checked={values.esterilizado ?? false}
+              onChange={(e) => setValues((prev) => ({ ...prev, esterilizado: e.target.checked }))}
+              className="h-5 w-5 accent-primary-ink"
+            />
+          </label>
+          <TextField
+            id="fecha_nacimiento"
+            label="Fecha de nacimiento"
+            type="date"
+            hint="Aproximada sirve: se usa para mostrar la edad."
+            value={values.fecha_nacimiento ?? ""}
+            onChange={handleChange("fecha_nacimiento")}
+          />
+          <TextField id="color" label="Color" value={values.color ?? ""} onChange={handleChange("color")} />
+          <TextField
+            id="peso_actual"
+            label="Peso actual (kg)"
+            type="number"
+            inputMode="decimal"
+            step="0.1"
+            min="0"
+            value={values.peso_actual ?? ""}
+            onChange={handleChange("peso_actual")}
+          />
+          <TextField id="microchip" label="Microchip" inputMode="numeric" value={values.microchip ?? ""} onChange={handleChange("microchip")} />
+        </Section>
 
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full rounded-lg bg-primary py-2.5 font-semibold text-white transition hover:bg-primary-hover disabled:opacity-60"
-        >
-          {saving ? "Guardando…" : "Guardar"}
-        </button>
+        <Section title="Salud y carácter">
+          <TextAreaField id="alergias" label="Alergias" value={values.alergias ?? ""} onChange={handleChange("alergias")} />
+          <TextAreaField
+            id="condiciones_cronicas"
+            label="Condiciones crónicas"
+            value={values.condiciones_cronicas ?? ""}
+            onChange={handleChange("condiciones_cronicas")}
+          />
+          <TextField
+            id="temperamento"
+            label="Temperamento"
+            placeholder="Tranquilo, muerde al revisar oídos…"
+            value={values.temperamento ?? ""}
+            onChange={handleChange("temperamento")}
+          />
+          {isEdit && (
+            <SelectField id="estado" label="Estado" value={values.estado} onChange={handleChange("estado")}>
+              <option value="activo">Activo</option>
+              <option value="fallecido">Fallecido</option>
+              <option value="adoptado">Adoptado</option>
+            </SelectField>
+          )}
+        </Section>
       </form>
+
+      <BottomBar>
+        <button type="submit" form="mascota-form" disabled={saving} className={buttonClass.primary}>
+          {saving ? "Guardando…" : isEdit ? "Guardar cambios" : "Agregar mascota"}
+        </button>
+      </BottomBar>
     </div>
   );
 }

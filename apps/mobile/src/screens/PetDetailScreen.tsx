@@ -1,18 +1,32 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Pencil, Plus, Stethoscope, Weight } from "lucide-react";
+import { AlertTriangle, Pencil, Plus, Weight, CalendarClock } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { AppHeader } from "@/components/AppHeader";
+import { AppHeader, headerIconClass } from "@/components/AppHeader";
+import { EmptyState, Loading, Section } from "@/components/ui";
 import type { Tables } from "@vetvalpo/supabase";
 
 function formatFecha(iso: string) {
-  return new Date(iso).toLocaleDateString("es-CL", { day: "2-digit", month: "short", year: "numeric" });
+  // Las fechas "YYYY-MM-DD" se leen en UTC para que no se corran un día en Chile.
+  const date = iso.length === 10 ? new Date(`${iso}T12:00:00Z`) : new Date(iso);
+  return date.toLocaleDateString("es-CL", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function edad(fechaNacimiento: string | null): string | null {
+  if (!fechaNacimiento) return null;
+  const nacimiento = new Date(`${fechaNacimiento}T12:00:00Z`);
+  const meses =
+    (new Date().getFullYear() - nacimiento.getUTCFullYear()) * 12 + (new Date().getMonth() - nacimiento.getUTCMonth());
+  if (meses < 0) return null;
+  if (meses < 12) return `${meses} ${meses === 1 ? "mes" : "meses"}`;
+  const anios = Math.floor(meses / 12);
+  return `${anios} ${anios === 1 ? "año" : "años"}`;
 }
 
 export function PetDetailScreen() {
   const { mascotaId } = useParams<{ mascotaId: string }>();
   const [mascota, setMascota] = useState<Tables<"mascotas"> | null | undefined>(undefined);
-  const [visitas, setVisitas] = useState<Tables<"visitas">[]>([]);
+  const [visitas, setVisitas] = useState<Tables<"visitas">[] | null>(null);
 
   useEffect(() => {
     if (!mascotaId) return;
@@ -41,104 +55,119 @@ export function PetDetailScreen() {
     };
   }, [mascotaId]);
 
-  if (mascota === undefined) {
+  if (mascota === undefined || mascota === null) {
     return (
       <div className="min-h-screen bg-neutral-50">
         <AppHeader title="Mascota" back />
-        <p className="p-4 text-center text-sm text-neutral-500">Cargando…</p>
+        {mascota === undefined ? <Loading /> : <div className="p-4"><EmptyState>No se encontró la mascota.</EmptyState></div>}
       </div>
     );
   }
 
-  if (mascota === null) {
-    return (
-      <div className="min-h-screen bg-neutral-50">
-        <AppHeader title="Mascota" back />
-        <p className="p-4 text-center text-sm text-neutral-500">No se encontró la mascota.</p>
-      </div>
-    );
-  }
+  const datos: [string, string][] = [
+    ["Sexo", mascota.sexo && mascota.sexo !== "desconocido" ? mascota.sexo[0].toUpperCase() + mascota.sexo.slice(1) : "—"],
+    ["Esterilizado", mascota.esterilizado ? "Sí" : "No"],
+    ["Peso actual", mascota.peso_actual ? `${mascota.peso_actual} kg` : "—"],
+    ["Edad", edad(mascota.fecha_nacimiento) ?? "—"],
+    ["Color", mascota.color ?? "—"],
+    ["Microchip", mascota.microchip ?? "—"],
+  ];
 
   return (
-    <div className="min-h-screen bg-neutral-50 pb-24">
+    <div className="min-h-screen bg-neutral-50 pb-[calc(6.5rem+env(safe-area-inset-bottom))]">
       <AppHeader
         title={mascota.nombre}
         subtitle={`${mascota.especie}${mascota.raza ? ` · ${mascota.raza}` : ""}`}
         back
         action={
-          <Link to={`/mascotas/${mascota.id}/editar`} aria-label="Editar mascota">
+          <Link to={`/mascotas/${mascota.id}/editar`} aria-label="Editar mascota" className={headerIconClass}>
             <Pencil size={20} />
           </Link>
         }
       />
 
       <div className="space-y-4 p-4">
-        <section className="grid grid-cols-2 gap-3 rounded-xl bg-white p-4 shadow-sm text-sm">
-          <div>
-            <p className="text-neutral-400">Sexo</p>
-            <p className="font-medium capitalize text-neutral-800">{mascota.sexo ?? "—"}</p>
+        {/* Alergias y condiciones crónicas arriba y destacadas: es lo que no se puede pasar por alto antes de tratar. */}
+        {(mascota.alergias || mascota.condiciones_cronicas) && (
+          <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-950" role="note">
+            <p className="mb-1 flex items-center gap-2 font-semibold">
+              <AlertTriangle size={17} aria-hidden="true" /> Antes de tratar
+            </p>
+            {mascota.alergias && (
+              <p>
+                <span className="font-medium">Alergias:</span> {mascota.alergias}
+              </p>
+            )}
+            {mascota.condiciones_cronicas && (
+              <p>
+                <span className="font-medium">Condiciones crónicas:</span> {mascota.condiciones_cronicas}
+              </p>
+            )}
           </div>
-          <div>
-            <p className="text-neutral-400">Esterilizado</p>
-            <p className="font-medium text-neutral-800">{mascota.esterilizado ? "Sí" : "No"}</p>
-          </div>
-          <div>
-            <p className="text-neutral-400">Peso actual</p>
-            <p className="font-medium text-neutral-800">{mascota.peso_actual ? `${mascota.peso_actual} kg` : "—"}</p>
-          </div>
-          <div>
-            <p className="text-neutral-400">Color</p>
-            <p className="font-medium text-neutral-800">{mascota.color ?? "—"}</p>
-          </div>
-          {mascota.alergias && (
-            <div className="col-span-2">
-              <p className="text-neutral-400">Alergias</p>
-              <p className="font-medium text-neutral-800">{mascota.alergias}</p>
-            </div>
-          )}
-          {mascota.condiciones_cronicas && (
-            <div className="col-span-2">
-              <p className="text-neutral-400">Condiciones crónicas</p>
-              <p className="font-medium text-neutral-800">{mascota.condiciones_cronicas}</p>
-            </div>
-          )}
-        </section>
+        )}
 
-        <section>
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400">Historial de visitas</h2>
-          </div>
+        <Section title="Datos">
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+            {datos.map(([label, value]) => (
+              <div key={label} className="min-w-0">
+                <dt className="text-neutral-500">{label}</dt>
+                <dd className="truncate font-medium text-ink">{value}</dd>
+              </div>
+            ))}
+            {mascota.temperamento && (
+              <div className="col-span-2">
+                <dt className="text-neutral-500">Temperamento</dt>
+                <dd className="font-medium text-ink">{mascota.temperamento}</dd>
+              </div>
+            )}
+          </dl>
+        </Section>
 
-          {visitas.length === 0 ? (
+        <Section title={visitas ? `Historial (${visitas.length})` : "Historial"}>
+          {visitas === null ? (
+            <Loading />
+          ) : visitas.length === 0 ? (
             <p className="text-sm text-neutral-500">Sin visitas registradas.</p>
           ) : (
-            <ul className="space-y-2">
+            <ol className="-mx-4 -mb-4 divide-y divide-neutral-100 border-t border-neutral-100">
               {visitas.map((visita) => (
-                <li key={visita.id} className="rounded-xl bg-white p-4 shadow-sm">
-                  <div className="mb-1 flex items-center justify-between">
-                    <p className="flex items-center gap-1.5 text-sm font-semibold text-neutral-800">
-                      <Stethoscope size={15} className="text-primary" /> {visita.motivo}
-                    </p>
-                    <p className="text-xs text-neutral-400">{formatFecha(visita.fecha)}</p>
+                <li key={visita.id} className="px-4 py-3">
+                  <div className="mb-0.5 flex items-baseline justify-between gap-3">
+                    <p className="min-w-0 font-semibold text-ink">{visita.motivo}</p>
+                    <p className="shrink-0 text-xs tabular-nums text-neutral-500">{formatFecha(visita.fecha)}</p>
                   </div>
-                  {visita.diagnostico && <p className="text-sm text-neutral-600">{visita.diagnostico}</p>}
-                  {visita.peso_registrado && (
-                    <p className="mt-1 flex items-center gap-1 text-xs text-neutral-500">
-                      <Weight size={12} /> {visita.peso_registrado} kg
+                  {visita.diagnostico && <p className="text-sm text-neutral-700">{visita.diagnostico}</p>}
+                  {visita.tratamiento && (
+                    <p className="text-sm text-neutral-600">
+                      <span className="text-neutral-500">Tratamiento:</span> {visita.tratamiento}
+                    </p>
+                  )}
+                  {(visita.peso_registrado || visita.proxima_cita) && (
+                    <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs text-neutral-500">
+                      {visita.peso_registrado && (
+                        <span className="flex items-center gap-1">
+                          <Weight size={12} aria-hidden="true" /> {visita.peso_registrado} kg
+                        </span>
+                      )}
+                      {visita.proxima_cita && (
+                        <span className="flex items-center gap-1">
+                          <CalendarClock size={12} aria-hidden="true" /> Control: {formatFecha(visita.proxima_cita)}
+                        </span>
+                      )}
                     </p>
                   )}
                 </li>
               ))}
-            </ul>
+            </ol>
           )}
-        </section>
+        </Section>
       </div>
 
       <Link
         to={`/mascotas/${mascota.id}/visitas/nueva`}
-        className="fixed bottom-6 right-6 flex items-center gap-2 rounded-full bg-primary px-5 py-3.5 font-semibold text-white shadow-lg"
+        className="fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-4 flex min-h-14 items-center gap-2 rounded-full bg-primary-ink px-5 font-heading font-bold text-white shadow-lg shadow-black/15 active:scale-[0.97]"
       >
-        <Plus size={20} /> Nueva visita
+        <Plus size={20} aria-hidden="true" /> Registrar visita
       </Link>
     </div>
   );

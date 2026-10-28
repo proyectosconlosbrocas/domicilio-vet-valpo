@@ -5,6 +5,7 @@ import { MapPin, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { AppHeader } from "@/components/AppHeader";
 import { TextField } from "@/components/fields";
+import { BottomBar, ErrorBanner, Loading, Section, buttonClass, friendlyError } from "@/components/ui";
 import type { TablesInsert } from "@vetvalpo/supabase";
 
 type FormValues = Omit<TablesInsert<"clientes">, "id" | "auth_user_id" | "activo" | "created_at" | "updated_at">;
@@ -68,14 +69,14 @@ export function ClientFormScreen() {
     setLocating(true);
     setLocationError(null);
     try {
-      const position = await Geolocation.getCurrentPosition({ enableHighAccuracy: true });
+      const position = await Geolocation.getCurrentPosition({ enableHighAccuracy: true, timeout: 15000 });
       setValues((prev) => ({
         ...prev,
         direccion_lat: position.coords.latitude,
         direccion_lng: position.coords.longitude,
       }));
     } catch {
-      setLocationError("No se pudo obtener la ubicación. Revisá que el permiso de ubicación esté activo.");
+      setLocationError("No se pudo obtener la ubicación. Revisa que el GPS y el permiso de ubicación estén activos.");
     } finally {
       setLocating(false);
     }
@@ -86,7 +87,12 @@ export function ClientFormScreen() {
     setSaving(true);
     setError(null);
 
-    const payload = { ...values, rut: values.rut || null, email: values.email || null };
+    const payload = {
+      ...values,
+      nombre: values.nombre.trim(),
+      rut: values.rut?.trim() || null,
+      email: values.email?.trim() || null,
+    };
 
     const result = isEdit
       ? await supabase.from("clientes").update(payload).eq("id", clienteId!).select("id").single()
@@ -94,17 +100,19 @@ export function ClientFormScreen() {
 
     setSaving(false);
     if (result.error) {
-      setError(result.error.message);
+      setError(friendlyError(result.error.message));
       return;
     }
     navigate(`/clientes/${result.data.id}`, { replace: true });
   }
 
+  const title = isEdit ? "Editar cliente" : "Nuevo cliente";
+
   if (loading) {
     return (
       <div className="min-h-screen bg-neutral-50">
-        <AppHeader title={isEdit ? "Editar cliente" : "Nuevo cliente"} back />
-        <p className="p-4 text-center text-sm text-neutral-500">Cargando…</p>
+        <AppHeader title={title} back />
+        <Loading />
       </div>
     );
   }
@@ -112,70 +120,107 @@ export function ClientFormScreen() {
   const tieneUbicacion = values.direccion_lat != null && values.direccion_lng != null;
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <AppHeader title={isEdit ? "Editar cliente" : "Nuevo cliente"} back />
+    <div className="min-h-screen bg-neutral-50 pb-[calc(6rem+env(safe-area-inset-bottom))]">
+      <AppHeader title={title} back />
 
-      <form onSubmit={handleSubmit} className="p-4">
-        {error && (
-          <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
-            {error}
-          </p>
-        )}
+      <form id="cliente-form" onSubmit={handleSubmit} className="space-y-4 p-4">
+        <ErrorBanner message={error} />
 
-        <TextField id="nombre" label="Nombre completo" required value={values.nombre} onChange={handleChange("nombre")} />
-        <TextField id="rut" label="RUT" value={values.rut ?? ""} onChange={handleChange("rut")} />
-        <TextField id="telefono" label="Teléfono" type="tel" value={values.telefono ?? ""} onChange={handleChange("telefono")} />
-        <TextField
-          id="telefono_alternativo"
-          label="Teléfono alternativo"
-          type="tel"
-          value={values.telefono_alternativo ?? ""}
-          onChange={handleChange("telefono_alternativo")}
-        />
-        <TextField id="email" label="Email" type="email" value={values.email ?? ""} onChange={handleChange("email")} />
-        <TextField id="direccion" label="Dirección" value={values.direccion ?? ""} onChange={handleChange("direccion")} />
+        <Section title="Datos">
+          <TextField
+            id="nombre"
+            label="Nombre completo"
+            required
+            autoComplete="off"
+            autoCapitalize="words"
+            value={values.nombre}
+            onChange={handleChange("nombre")}
+          />
+          <TextField id="rut" label="RUT" placeholder="12.345.678-9" value={values.rut ?? ""} onChange={handleChange("rut")} />
+        </Section>
 
-        <div className="mb-4">
+        <Section title="Contacto">
+          <TextField
+            id="telefono"
+            label="Teléfono"
+            type="tel"
+            inputMode="tel"
+            placeholder="+56 9 1234 5678"
+            hint="Se usa para los botones de WhatsApp y llamada."
+            value={values.telefono ?? ""}
+            onChange={handleChange("telefono")}
+          />
+          <TextField
+            id="telefono_alternativo"
+            label="Teléfono alternativo"
+            type="tel"
+            inputMode="tel"
+            value={values.telefono_alternativo ?? ""}
+            onChange={handleChange("telefono_alternativo")}
+          />
+          <TextField
+            id="email"
+            label="Email"
+            type="email"
+            inputMode="email"
+            autoCapitalize="none"
+            value={values.email ?? ""}
+            onChange={handleChange("email")}
+          />
+        </Section>
+
+        <Section title="Dirección">
+          <TextField
+            id="direccion"
+            label="Dirección"
+            placeholder="Calle, número, cerro o sector"
+            value={values.direccion ?? ""}
+            onChange={handleChange("direccion")}
+          />
           <button
             type="button"
             onClick={handleRegistrarUbicacion}
             disabled={locating}
-            className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary py-2.5 text-sm font-semibold text-primary transition disabled:opacity-60"
+            className={buttonClass.secondary}
           >
-            <MapPin size={16} />
-            {locating ? "Obteniendo ubicación…" : "Registrar dirección con Google Maps"}
+            <MapPin size={18} className="text-primary-ink" />
+            {locating ? "Obteniendo ubicación…" : tieneUbicacion ? "Actualizar ubicación GPS" : "Guardar ubicación GPS actual"}
           </button>
           {tieneUbicacion && (
-            <p className="mt-1.5 flex items-center gap-1 text-xs text-neutral-500">
-              <CheckCircle2 size={14} className="text-primary" />
-              Ubicación capturada ({values.direccion_lat!.toFixed(5)}, {values.direccion_lng!.toFixed(5)})
+            <p className="mt-2 flex items-center gap-1.5 text-sm text-neutral-600">
+              <CheckCircle2 size={16} className="text-whatsapp" />
+              Ubicación guardada: “Cómo llegar” abrirá Google Maps aquí.
             </p>
           )}
-          {locationError && <p className="mt-1.5 text-xs text-red-600">{locationError}</p>}
-        </div>
+          {!tieneUbicacion && !locationError && (
+            <p className="mt-2 text-xs text-neutral-500">Úsalo estando en la casa del cliente para llegar exacto la próxima vez.</p>
+          )}
+          {locationError && <p className="mt-2 text-sm text-red-700">{locationError}</p>}
+        </Section>
 
-        <TextField
-          id="contacto_emergencia_nombre"
-          label="Contacto de emergencia — nombre"
-          value={values.contacto_emergencia_nombre ?? ""}
-          onChange={handleChange("contacto_emergencia_nombre")}
-        />
-        <TextField
-          id="contacto_emergencia_telefono"
-          label="Contacto de emergencia — teléfono"
-          type="tel"
-          value={values.contacto_emergencia_telefono ?? ""}
-          onChange={handleChange("contacto_emergencia_telefono")}
-        />
-
-        <button
-          type="submit"
-          disabled={saving}
-          className="w-full rounded-lg bg-primary py-2.5 font-semibold text-white transition hover:bg-primary-hover disabled:opacity-60"
-        >
-          {saving ? "Guardando…" : "Guardar"}
-        </button>
+        <Section title="Contacto de emergencia">
+          <TextField
+            id="contacto_emergencia_nombre"
+            label="Nombre"
+            value={values.contacto_emergencia_nombre ?? ""}
+            onChange={handleChange("contacto_emergencia_nombre")}
+          />
+          <TextField
+            id="contacto_emergencia_telefono"
+            label="Teléfono"
+            type="tel"
+            inputMode="tel"
+            value={values.contacto_emergencia_telefono ?? ""}
+            onChange={handleChange("contacto_emergencia_telefono")}
+          />
+        </Section>
       </form>
+
+      <BottomBar>
+        <button type="submit" form="cliente-form" disabled={saving} className={buttonClass.primary}>
+          {saving ? "Guardando…" : isEdit ? "Guardar cambios" : "Crear cliente"}
+        </button>
+      </BottomBar>
     </div>
   );
 }

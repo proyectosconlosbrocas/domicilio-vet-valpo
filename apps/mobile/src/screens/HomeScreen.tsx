@@ -1,36 +1,53 @@
 import { Link } from "react-router-dom";
-import { UserPlus, Users, PencilLine, CalendarPlus } from "lucide-react";
+import { UserPlus, Users, PencilLine, CalendarPlus, ChevronRight } from "lucide-react";
 import { AppHeader } from "@/components/AppHeader";
 import { HomeCalendar } from "@/components/HomeCalendar";
+import { buttonClass } from "@/components/ui";
 
-const OPTIONS = [
-  { to: "/clientes/nuevo", label: "Agregar cliente", icon: UserPlus },
+const CLIENT_LINKS = [
   { to: "/clientes", label: "Ver clientes", icon: Users },
+  { to: "/clientes/nuevo", label: "Agregar cliente", icon: UserPlus },
   { to: "/clientes/editar", label: "Editar clientes", icon: PencilLine },
-  { to: "/agendar-visita", label: "Agendar visita", icon: CalendarPlus },
 ];
 
+const todayLabel = new Intl.DateTimeFormat("es-CL", {
+  timeZone: "America/Santiago",
+  weekday: "long",
+  day: "numeric",
+  month: "long",
+}).format(new Date());
+
+/**
+ * La pregunta de esta pantalla es "¿a quién visito hoy?": por eso el
+ * calendario abre con el día de hoy seleccionado y su lista de visitas, y la
+ * acción principal (agendar) va arriba, al alcance del pulgar.
+ */
 export function HomeScreen() {
   return (
-    <div className="min-h-screen bg-neutral-50">
-      <AppHeader title="Domicilio Vet Valpo" />
+    <div className="min-h-screen bg-neutral-50 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+      <AppHeader title="Domicilio Vet Valpo" subtitle={todayLabel.charAt(0).toUpperCase() + todayLabel.slice(1)} />
 
-      <div className="grid grid-cols-2 gap-3 p-4">
-        {OPTIONS.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            className="flex flex-col items-center gap-2 rounded-xl bg-white p-3 text-center shadow-sm transition active:scale-[0.99]"
-          >
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-              <Icon size={18} />
-            </div>
-            <span className="text-sm font-semibold text-neutral-800">{label}</span>
-          </Link>
-        ))}
+      <div className="space-y-4 p-4">
+        <Link to="/agendar-visita" className={buttonClass.primary}>
+          <CalendarPlus size={20} aria-hidden="true" /> Agendar visita
+        </Link>
+
+        <HomeCalendar />
+
+        <nav aria-label="Clientes" className="overflow-hidden rounded-2xl border border-neutral-200/80 bg-white">
+          <ul className="divide-y divide-neutral-100">
+            {CLIENT_LINKS.map(({ to, label, icon: Icon }) => (
+              <li key={to}>
+                <Link to={to} className="flex min-h-14 items-center gap-3 px-4 active:bg-neutral-50">
+                  <Icon size={20} className="text-neutral-500" aria-hidden="true" />
+                  <span className="flex-1 font-medium text-ink">{label}</span>
+                  <ChevronRight size={18} className="text-neutral-400" aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </div>
-
-      <HomeCalendar />
     </div>
   );
 }

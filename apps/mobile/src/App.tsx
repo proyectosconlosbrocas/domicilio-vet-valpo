@@ -15,24 +15,47 @@ import { VisitFormScreen } from "@/screens/VisitFormScreen";
 const STAFF_EMAIL = import.meta.env.VITE_STAFF_EMAIL as string;
 const STAFF_PASSWORD = import.meta.env.VITE_STAFF_PASSWORD as string;
 
+/** Pantalla completa para los estados de arranque (cargando, sin conexión, sin acceso). */
+function StartupScreen({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center gap-5 bg-white px-8 text-center">
+      <img src="/icono.png" alt="" className="h-16 w-16" />
+      <p className="max-w-xs text-base text-neutral-600" role="status">
+        {message}
+      </p>
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="min-h-12 rounded-xl bg-primary-ink px-6 font-heading font-bold text-white active:scale-[0.98]"
+        >
+          Reintentar
+        </button>
+      )}
+    </div>
+  );
+}
+
 function StaffGate({ session }: { session: Session }) {
-  const staff = useStaff(session);
+  const [retryKey, setRetryKey] = useState(0);
+  const staff = useStaff(session, retryKey);
 
   if (staff === undefined) {
+    return <StartupScreen message="Verificando acceso…" />;
+  }
+
+  if (staff === "error") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-50 text-neutral-500">
-        Verificando acceso…
-      </div>
+      <StartupScreen
+        message="No se pudo conectar. Revisa tu conexión a internet."
+        onRetry={() => setRetryKey((k) => k + 1)}
+      />
     );
   }
 
   if (staff === null) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-neutral-50 px-6 text-center">
-        <p className="text-neutral-700">
-          La cuenta configurada ({session.user.email}) no está registrada como staff todavía.
-        </p>
-      </div>
+      <StartupScreen message={`La cuenta configurada (${session.user.email}) no está registrada como staff todavía.`} />
     );
   }
 
@@ -67,6 +90,7 @@ function StaffGate({ session }: { session: Session }) {
 function App() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -79,7 +103,7 @@ function App() {
       if (cancelled) return;
 
       if (error) {
-        setAuthError("No se pudo conectar. Revisá tu conexión a internet e intentá de nuevo.");
+        setAuthError("No se pudo conectar. Revisa tu conexión a internet e intenta de nuevo.");
         return;
       }
       setAuthError(null);
@@ -114,22 +138,22 @@ function App() {
       cancelled = true;
       subscription.subscription.unsubscribe();
     };
-  }, []);
+  }, [retryKey]);
 
   if (authError) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-6 text-center text-neutral-500">
-        {authError}
-      </div>
+      <StartupScreen
+        message={authError}
+        onRetry={() => {
+          setAuthError(null);
+          setRetryKey((k) => k + 1);
+        }}
+      />
     );
   }
 
   if (!session) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-neutral-50 text-neutral-500">
-        Cargando…
-      </div>
-    );
+    return <StartupScreen message="Cargando…" />;
   }
 
   return <StaffGate session={session} />;
