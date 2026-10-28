@@ -1,0 +1,56 @@
+name: Health check + keep-alive Supabase
+
+# Días 1, 6, 11, 16, 21, 26 y 31 de cada mes (10:00 Chile aprox.). Un cron no
+# puede expresar "cada 6 días" exacto; con este calendario el mayor intervalo
+# es 6 días (del 26 al 1), siempre por debajo de los 7 que pausan Supabase Free.
+on:
+  schedule:
+    - cron: "0 13 1,6,11,16,21,26,31 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Chequear salud del proyecto
+        id: check
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+          STAFF_EMAIL: ${{ secrets.STAFF_EMAIL }}
+          STAFF_PASSWORD: ${{ secrets.STAFF_PASSWORD }}
+        run: node scripts/health-check.mjs
+
+      # El informe va como comentario a un issue fijo: GitHub avisa por correo
+      # en cada ejecución, no solo cuando algo falla.
+      - name: Publicar informe en el issue "Health del proyecto"
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -f health-report.md ] || echo "❌ El chequeo no llegó a generar informe. Revisar el log del workflow." > health-report.md
+          echo "" >> health-report.md
+          echo "[Ver ejecución](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" >> health-report.md
+          issue=$(gh issue list --label health-check --state open --json number --jq '.[0].number')
+          if [ -z "$issue" ]; then
+            gh label create health-check --color 0E8A16 --description "Informes automáticos de salud" 2>/dev/null || true
+            issue=$(gh issue create --title "Health del proyecto (informes automáticos)" --label health-check \
+              --body "Informes automáticos del workflow health-check.yml. Cada comentario es una ejecución." | grep -o '[0-9]*$')
+          fi
+          gh issue comment "$issue" --body-file health-report.md
+
+      - name: Marcar la ejecución como fallida si hubo problemas
+        if: steps.check.outcome == 'failure'
+        run: exit 1
