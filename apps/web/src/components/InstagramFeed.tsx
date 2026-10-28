@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { FaInstagram } from "react-icons/fa";
 import { galleryPhotos } from "@/data/gallery";
-import { useInView } from "@/hooks/use-in-view";
+import { motion } from "motion/react";
+import { Reveal, RevealGroup, RevealItem } from "./motion/Reveal";
 
 const INSTAGRAM_URL = "https://www.instagram.com/domicilio.vet.valpo/";
 /** Por debajo de esto el feed se ve incompleto y se usan las fotos propias. */
@@ -29,8 +30,6 @@ interface Tile {
 export function InstagramFeed() {
   const [posts, setPosts] = useState<InstagramPost[]>([]);
   const [failed, setFailed] = useState<Set<number>>(new Set());
-  const head = useInView<HTMLDivElement>();
-  const grid = useInView<HTMLDivElement>({ delay: 90 });
 
   useEffect(() => {
     let cancelled = false;
@@ -60,18 +59,20 @@ export function InstagramFeed() {
   return (
     <section id="galeria" className="section">
       <div className="wrap">
-        <div ref={head.ref} className={`section-head reveal ${head.isVisible ? "is-visible" : ""}`}>
+        <Reveal className="section-head">
           <h2 className="section-title">En casa de nuestros pacientes</h2>
           <p className="section-lead">
             Patios, livings y operativos en los cerros: así se ve una visita de Domicilio Vet Valpo.
           </p>
-        </div>
+        </Reveal>
 
-        <div ref={grid.ref} className={`gallery reveal ${grid.isVisible ? "is-visible" : ""}`}>
+        <RevealGroup className="gallery">
           {tiles.map((tile) => (
-            <a
-              key={tile.src}
+            <RevealItem key={tile.src}>
+            <motion.a
               className="gallery-item"
+              whileHover={{ y: -6, rotate: -0.6 }}
+              transition={{ type: "spring", stiffness: 300, damping: 22 }}
               href={tile.href}
               target="_blank"
               rel="noopener noreferrer"
@@ -87,9 +88,10 @@ export function InstagramFeed() {
                     : () => setFailed((prev) => new Set(prev).add(tile.index!))
                 }
               />
-            </a>
+            </motion.a>
+            </RevealItem>
           ))}
-        </div>
+        </RevealGroup>
 
         <div className="gallery-footer">
           <p>Más visitas y avisos de operativos en Instagram.</p>

@@ -1,17 +1,20 @@
+import { motion } from "motion/react";
 import { Check, MapPin } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import type { Operativo } from "@/data/operativos";
 import { buildWhatsappLink } from "@/lib/whatsapp";
-import { useInView } from "@/hooks/use-in-view";
+import { RevealItem } from "./motion/Reveal";
 
-export function OperativoCard({ operativo, delay = 0 }: { operativo: Operativo; delay?: number }) {
-  const { ref, isVisible } = useInView<HTMLElement>({ delay });
-
+export function OperativoCard({ operativo }: { operativo: Operativo }) {
   return (
-    <article ref={ref} className={`operativo reveal ${isVisible ? "is-visible" : ""}`}>
-      <div className={`operativo-media ${operativo.imagePositionBottom ? "bottom" : ""}`}>
+    <RevealItem as="article" className="operativo">
+      <motion.div
+        className={`operativo-media ${operativo.imagePositionBottom ? "bottom" : ""}`}
+        whileHover={{ scale: 1.015 }}
+        transition={{ duration: 0.3 }}
+      >
         <img src={operativo.image} alt={operativo.imageAlt} loading="lazy" />
-      </div>
+      </motion.div>
       <h3 className="operativo-title">Operativo de {operativo.title.toLowerCase()}</h3>
       <p className="operativo-where">
         <MapPin size={16} aria-hidden="true" /> {operativo.location}
@@ -26,12 +29,12 @@ export function OperativoCard({ operativo, delay = 0 }: { operativo: Operativo; 
       </ul>
       <a
         href={buildWhatsappLink(operativo.whatsappMessage)}
-        className="btn btn-whatsapp btn-sm"
+        className="btn btn-on-red btn-sm"
         target="_blank"
         rel="noopener noreferrer"
       >
         <FaWhatsapp aria-hidden="true" /> Consultar próximo operativo
       </a>
-    </article>
+    </RevealItem>
   );
 }

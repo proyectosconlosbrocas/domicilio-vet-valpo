@@ -2,16 +2,16 @@ import { Clock, MapPin } from "lucide-react";
 import { FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { ContactForm } from "./ContactForm";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
-import { useInView } from "@/hooks/use-in-view";
+import { Reveal } from "./motion/Reveal";
+import { BrandPattern } from "./motion/Backdrops";
 
 export function Contact() {
-  const left = useInView<HTMLDivElement>();
-  const right = useInView<HTMLDivElement>({ delay: 90 });
-
   return (
-    <section id="contacto" className="section section-alt">
+    <section id="contacto" className="section section-contact">
+      <BrandPattern tone="red" opacity={0.08} drift={50} fade="right" />
+
       <div className="wrap contact-grid">
-        <div ref={left.ref} className={`reveal ${left.isVisible ? "is-visible" : ""}`}>
+        <Reveal>
           <h2 className="section-title">Agenda una visita</h2>
           <p className="section-lead mt-4">
             Escríbenos por WhatsApp o deja tus datos en el formulario. Te respondemos para coordinar el día y la hora.
@@ -48,11 +48,11 @@ export function Contact() {
               </a>
             </li>
           </ul>
-        </div>
+        </Reveal>
 
-        <div ref={right.ref} className={`reveal ${right.isVisible ? "is-visible" : ""}`}>
+        <Reveal delay={0.1}>
           <ContactForm />
-        </div>
+        </Reveal>
       </div>
     </section>
   );

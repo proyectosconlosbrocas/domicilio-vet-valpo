@@ -400,7 +400,33 @@ p {
 /* ---------- Hero ---------- */
 
 .hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: var(--ground-alt);
   padding-block: clamp(2rem, 1rem + 4vw, 4.5rem) clamp(3.5rem, 2rem + 5vw, 6.5rem);
+}
+
+/* Foto del hero con un bloque de color de marca detrás, desfasado. */
+.hero-media {
+  position: relative;
+}
+
+.hero-media-block {
+  position: absolute;
+  inset: 12% -2.5% -4% 14%;
+  border-radius: var(--radius-media);
+  background: var(--red);
+}
+
+.hero-media > :not(.hero-media-block) {
+  position: relative;
+}
+
+@media (max-width: 1023px) {
+  .hero-media-block {
+    inset: 10% -2% -4% 18%;
+  }
 }
 
 .hero-grid {
@@ -635,30 +661,50 @@ p {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: clamp(2rem, 1rem + 3vw, 4rem);
   }
+}
 
-  .service-feature:nth-child(even) .service-feature-media {
+.service-feature-media-wrap {
+  position: relative;
+}
+
+.service-feature-block {
+  position: absolute;
+  inset: 14% 12% -7% -4%;
+  border-radius: var(--radius-media);
+  background: var(--red-soft);
+}
+
+@media (min-width: 768px) {
+  .service-feature:nth-child(even) .service-feature-media-wrap {
     order: 2;
+  }
+
+  .service-feature:nth-child(even) .service-feature-block {
+    inset: 14% -4% -7% 12%;
   }
 }
 
 .service-feature-media {
+  position: relative;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: var(--radius-media);
   background: var(--ground-alt);
 }
 
-.service-feature-media img,
+/* La foto es más alta que su marco para que el parallax no deje bordes vacíos. */
+.service-feature-media img {
+  position: absolute;
+  inset: -8% 0;
+  width: 100%;
+  height: 116%;
+  object-fit: cover;
+}
+
 .service-more-media img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s var(--ease);
-}
-
-.service-feature:hover .service-feature-media img,
-.service-more-item:hover .service-more-media img {
-  transform: scale(1.03);
 }
 
 .service-feature-body {
@@ -771,7 +817,20 @@ p {
   margin: 0;
 }
 
+.about-photo {
+  position: relative;
+}
+
+.about-photo-block {
+  position: absolute;
+  inset: -5% 10% 12% -5%;
+  border-radius: var(--radius-media);
+  background: var(--red);
+}
+
 .about-figure img {
+  position: relative;
+  display: block;
   width: 100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
@@ -829,8 +888,40 @@ p {
 
 /* ---------- Operativos ---------- */
 
+/* Sección en rojo de marca (#C41E1E: blanco encima da 5.9:1). */
 .operativos {
+  background: var(--red-ink);
+  color: #fff;
+}
+
+.operativos .section-title,
+.operativos .section-lead,
+.operativos .operativo-title,
+.operativos .operativo p,
+.operativos .check-list li {
+  color: #fff;
+}
+
+.operativos .operativo-where {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.operativos .check-list svg {
+  color: #fff;
+}
+
+.operativos .operativo-media {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.btn-on-red {
+  background: #fff;
+  color: var(--red-ink);
+}
+
+.btn-on-red:hover {
   background: var(--red-soft);
+  color: var(--red-ink);
 }
 
 .operativos-grid {
@@ -883,7 +974,6 @@ p {
   margin: 0;
   font-size: var(--fs-small);
   font-weight: 600;
-  color: var(--red-ink);
 }
 
 .operativo p {
@@ -1304,44 +1394,120 @@ p {
   }
 }
 
-/* ---------- Entrada al hacer scroll ----------
-   Solo se oculta el contenido si el usuario acepta movimiento; con
-   prefers-reduced-motion todo queda visible desde el primer frame. */
+/* ---------- Fondos de sección (ver components/motion/Backdrops.tsx) ---------- */
 
-@media (prefers-reduced-motion: no-preference) {
-  .reveal {
-    opacity: 0;
-    transform: translateY(24px);
-    transition:
-      opacity 0.7s var(--ease),
-      transform 0.7s var(--ease);
-  }
+.section,
+.site-footer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
 
-  .reveal.is-visible {
-    opacity: 1;
-    transform: none;
-  }
+.section > .wrap,
+.hero > .wrap,
+.site-footer > .wrap {
+  position: relative;
+  z-index: 1;
+}
 
-  .hero-enter {
-    animation: hero-enter 0.8s var(--ease) both;
-  }
+.section-contact {
+  background: var(--red-soft);
+}
 
-  .hero-enter-2 {
-    animation-delay: 0.08s;
-  }
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
 
-  .hero-enter-3 {
-    animation-delay: 0.16s;
-  }
+/* Desvanecidos (son máscaras, no colores): el patrón se apaga donde va el texto. */
+.backdrop-fade-left {
+  -webkit-mask-image: linear-gradient(to right, transparent 20%, #000 75%);
+  mask-image: linear-gradient(to right, transparent 20%, #000 75%);
+}
 
-  .hero-enter-4 {
-    animation-delay: 0.24s;
-  }
+.backdrop-fade-right {
+  -webkit-mask-image: linear-gradient(to left, transparent 25%, #000 80%);
+  mask-image: linear-gradient(to left, transparent 25%, #000 80%);
+}
 
-  @keyframes hero-enter {
-    from {
-      opacity: 0;
-      transform: translateY(16px);
-    }
-  }
+.backdrop-fade-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, #000, transparent 85%);
+  mask-image: linear-gradient(to bottom, #000, transparent 85%);
+}
+
+.backdrop-fade-radial {
+  -webkit-mask-image: radial-gradient(ellipse at 50% 45%, transparent 25%, #000 75%);
+  mask-image: radial-gradient(ellipse at 50% 45%, transparent 25%, #000 75%);
+}
+
+/* La marca repetida: brand-tile.png y brand-mark.png son la cruz del logo sin
+   su círculo blanco, usadas solo como forma (máscara); el color lo da tone-*. */
+.brand-pattern {
+  position: absolute;
+  inset: -140px -80px;
+  rotate: -8deg;
+  -webkit-mask-image: url("/assets/brand-tile.png");
+  mask-image: url("/assets/brand-tile.png");
+  -webkit-mask-size: 180px;
+  mask-size: 180px;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+}
+
+.brand-mark {
+  position: absolute;
+  -webkit-mask-image: url("/assets/brand-mark.png");
+  mask-image: url("/assets/brand-mark.png");
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+.tone-red {
+  background-color: var(--red);
+}
+
+.tone-white {
+  background-color: #fff;
+}
+
+.tone-ink {
+  background-color: var(--ink);
+}
+
+/* ---------- Franja de marca en movimiento ---------- */
+
+.brand-strip {
+  overflow: hidden;
+  background: var(--ink);
+  color: #fff;
+  padding-block: 1.15rem;
+}
+
+.strip-track {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  width: max-content;
+}
+
+.strip-text {
+  font-family: var(--font-heading);
+  font-size: var(--fs-lead);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.strip-mark {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  background-color: var(--red);
+  -webkit-mask: url("/assets/brand-mark.png") center / contain no-repeat;
+  mask: url("/assets/brand-mark.png") center / contain no-repeat;
 }

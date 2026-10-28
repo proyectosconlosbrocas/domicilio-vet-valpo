@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { WHATSAPP_NUMBER } from "@/lib/whatsapp";
+import { BrandPattern } from "./motion/Backdrops";
 
 export function Footer() {
   return (
     <footer className="site-footer">
+      <BrandPattern tone="white" opacity={0.05} drift={30} fade="bottom" />
       <div className="wrap">
         <p className="footer-name">Domicilio Vet Valpo</p>
 
