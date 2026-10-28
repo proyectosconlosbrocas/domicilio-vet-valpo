@@ -236,6 +236,25 @@ Pedido explícito: esta app es de uso privado, nunca se va a distribuir (la inst
 
 **Checkpoint**: APK debug regenerado (`apps/mobile/builds/domicilio-vet-valpo-staff-debug.apk`), verificado también instalando el `.apk` real en un emulador Android (Pixel 7) además de Playwright.
 
+## Fase 21: Rediseño UX/UI total — web + app staff (P1) — 2026-10-28
+
+Criterio tomado de los skills de Kittypau (`design-taste-frontend` con su `lint.mjs` e `inspect.mjs`, `ux-heuristics`, `accessibility`), adaptados a este stack (Vite + React 18 + Tailwind 3). Paleta de marca intacta (#FF3737); sin dependencias nuevas.
+
+- [x] T082 Web: `legacy.css` (1.746 líneas, gradientes, sombras en reposo, pulsos, reglas que se pisaban) reemplazado por `styles/site.css` basado en tokens. Se carga después de Tailwind para que preflight no pise la base. Inspector: 10 FAIL / 8 WARN → 1 FAIL (barra CTA fija tapando texto al hacer scroll, esperable) / 1 WARN (sin video propio).
+- [x] T083 Hero: titular a tamaño display en 2 líneas, foto real dominante, una acción principal, horario/zona/precio en el primer pantallazo. Se quitaron la etiqueta "eyebrow", la marca de agua y la fila de 6 íconos.
+- [x] T084 Fotos reales de visitas (13 fotos WA sin usar) en carrusel, servicios y nueva galería "En casa de nuestros pacientes" (reemplaza al feed de Instagram cuando sus URLs firmadas caducan: antes la sección quedaba vacía).
+- [x] T085 Servicios como filas con foto + precio en vez de 6 tarjetas idénticas con ícono. Orden de secciones: Servicios → La doctora → Operativos → Galería → Contacto.
+- [x] T086 Contraste: botones de agendar en verde WhatsApp oscurecido (#0F7A41, 5.4:1) y rojo de texto #C41E1E; el #25D366 con blanco daba 2:1. Tokens shadcn del portal pasan al rojo oscuro por lo mismo.
+- [x] T087 Bugs: el botón redondo de WhatsApp debía ocultarse en móvil pero una regla posterior lo volvía a mostrar; el formulario abría WhatsApp dentro de un `setTimeout` (Safari/iOS lo bloquea como popup). Formulario con chips de servicio, `autocomplete` y labels visibles sin `aria-label` que los pisaran.
+- [x] T088 App staff: cabecera blanca, toques de 44px+, fuentes realmente cargadas (antes caían a la del sistema), inputs de 16px (evita zoom), formularios agrupados con botón fijo abajo respetando safe-area, errores de Supabase traducidos a mensajes accionables.
+- [x] T089 App staff — funcionamiento: el calendario abre con hoy seleccionado; puntos por cantidad de visitas; "Confirmar" por WhatsApp, "Cómo llegar" (Google Maps con ruta) y cancelar cita desde el día; ficha de cliente con Llamar / WhatsApp / Cómo llegar y "Agendar visita para…" con el cliente preseleccionado; búsqueda sin tildes; alergias y condiciones crónicas destacadas arriba en la ficha de mascota; edad calculada; registrar visita puede agendar el próximo control en el calendario; agendar propone hoy por defecto; GPS con timeout de 15 s.
+- [x] T090 App staff — arranque: un fallo de red ya no se muestra como "la cuenta no es staff"; pantallas de error con "Reintentar".
+- [x] T091 Verificado: `tsc -b` y build de producción de ambas apps, e2e 4/4, capturas a 1440/768/390 (web) y 390 (app, con respuestas de Supabase simuladas en el navegador). APK debug regenerado.
+
+- [x] T092 App staff: si el token guardado es inválido o fue revocado (401), se descarta la sesión local y se vuelve a entrar en silencio, en vez de quedar trabado en "No se pudo conectar".
+
+**Hallazgo resuelto el mismo día**: el proyecto de Supabase (`domicilio_vet_valpo`, org `Mauro_proyectos`, plan Free) estaba **pausado por inactividad** y su dominio no resolvía. Se reanudó desde el dashboard; las claves existentes siguen sirviendo y se verificó login de staff + lectura de `staff` y `agenda_visitas` contra la base real. En plan Free se vuelve a pausar tras ~7 días sin uso.
+
 ## Notes
 
 - Fases 1-6 (issues del sitio estático original) se resolvieron editando directamente HTML/CSS/JS sin build, en línea con el Principio I **original** de la Constitución (v1.0.0). La Fase 7 reemplaza esa arquitectura — ver el registro de excepción en `constitution.md` v2.0.0.
